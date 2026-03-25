@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 
 // ─── USERS ───────────────────────────────────────────────────
 const USERS = [
-  { id: "mgr1", name: "Admin Manager", email: "admin", password: "admin", role: "manager" },
-  { id: "rep1", name: "Jake Morrison", email: "jake", password: "1234", role: "rep" },
-  { id: "rep2", name: "Sarah Chen", email: "sarah", password: "1234", role: "rep" },
-  { id: "rep3", name: "Mike Davis", email: "mike", password: "1234", role: "rep" },
+  { id: "mgr1", name: "Andrew Smith", email: "andrew", password: "7663", role: "manager" },
+  { id: "mgr2", name: "Lee Hornsby", email: "lee", password: "7663", role: "manager" },
+  { id: "rep1", name: "Byron Cook", email: "byron", password: "Sales1", role: "rep" },
+  { id: "rep2", name: "Marcia", email: "marcia", password: "sales2", role: "rep" },
 ];
 
 // ─── SEED DATA ───────────────────────────────────────────────
@@ -39,14 +39,14 @@ const seedContacts = [
   { id: "ct17", repId: "rep2", company: "Guardian Roofs", name: "", title: "", phone: "(714) 633-3619", email: "", address: "Orange, CA (Orange County)", notes: "Since 1984. 300+ 5-star reviews. Owens Corning Platinum Preferred, GAF Master Elite. Resi & commercial. 36+ years", created: "2026-01-15" },
   { id: "ct18", repId: "rep2", company: "Pacific Roofing Systems", name: "", title: "", phone: "(949) 612-3788", email: "", address: "Orange County, CA", notes: "Resi & commercial. CertainTeed, Owens Corning, GAF. Shingles, tile, metal, coatings, solar-ready. Free contractor guide", created: "2026-02-05" },
   { id: "ct19", repId: "rep2", company: "CalCom Roofing Inc.", name: "", title: "", phone: "(714) 515-6085", email: "", address: "Orange County, CA", notes: "3rd generation. 80+ year heritage. Commercial specialist. High-rise, multi-family. Serves OC, Riverside, LA. $5M liability insurance", created: "2026-02-10" },
-  { id: "ct20", repId: "rep3", company: "Above It All Roofing", name: "", title: "", phone: "(949) 395-1300", email: "", address: "Orange County, CA", notes: "Veteran-owned. 27+ years. Resi roofing & repairs. Tailored solutions per home/budget. Clean jobsites", created: "2026-02-12" },
-  { id: "ct21", repId: "rep3", company: "Prestige Roofing & Solar", name: "John Arellano", title: "Owner", phone: "(714) 867-5070", email: "", address: "Orange County, CA", notes: "Serves OC, LA, Riverside. Resi & commercial. All major roof systems. Also does solar. Lic #1059050", created: "2026-02-15" },
-  { id: "ct22", repId: "rep3", company: "Meyers Roofing Co.", name: "", title: "", phone: "(562) 247-5241", email: "", address: "Southern California", notes: "Serves LA, OC, Long Beach, Santa Ana, Anaheim. Resi & commercial. Asphalt, tile, TPO. Storm damage restoration", created: "2026-02-18" },
+  { id: "ct20", repId: "rep2", company: "Above It All Roofing", name: "", title: "", phone: "(949) 395-1300", email: "", address: "Orange County, CA", notes: "Veteran-owned. 27+ years. Resi roofing & repairs. Tailored solutions per home/budget. Clean jobsites", created: "2026-02-12" },
+  { id: "ct21", repId: "rep2", company: "Prestige Roofing & Solar", name: "John Arellano", title: "Owner", phone: "(714) 867-5070", email: "", address: "Orange County, CA", notes: "Serves OC, LA, Riverside. Resi & commercial. All major roof systems. Also does solar. Lic #1059050", created: "2026-02-15" },
+  { id: "ct22", repId: "rep2", company: "Meyers Roofing Co.", name: "", title: "", phone: "(562) 247-5241", email: "", address: "Southern California", notes: "Serves LA, OC, Long Beach, Santa Ana, Anaheim. Resi & commercial. Asphalt, tile, TPO. Storm damage restoration", created: "2026-02-18" },
 
   // ── RIVERSIDE COUNTY — Roofing Contractors ──
-  { id: "ct23", repId: "rep3", company: "Rocket Roofing", name: "", title: "", phone: "(951) 710-7324", email: "", address: "27555 Ynez Rd Suite 110, Temecula, CA 92591", notes: "Serves Riverside, OC, San Bernardino, LA, SD. Resi & commercial. Inspections, repairs, maintenance", created: "2026-01-10" },
-  { id: "ct24", repId: "rep3", company: "619 Roofing", name: "", title: "", phone: "(619) 304-4868", email: "", address: "Riverside / Orange / San Bernardino County, CA", notes: "#1 choice of HOAs, realtors, commercial & resi owners. Tile with 2-layer UDL, 30-yr warranty. 24/7 emergency", created: "2026-02-20" },
-  { id: "ct25", repId: "rep3", company: "Infinity Roofers Inc.", name: "", title: "", phone: "(805) 855-8733", email: "", address: "Ventura / LA / OC / Riverside / San Bernardino", notes: "Resi & commercial. Asphalt shingle, flat, tile & metal roofs. Inspections. Diamond Certified", created: "2026-02-22" },
+  { id: "ct23", repId: "rep2", company: "Rocket Roofing", name: "", title: "", phone: "(951) 710-7324", email: "", address: "27555 Ynez Rd Suite 110, Temecula, CA 92591", notes: "Serves Riverside, OC, San Bernardino, LA, SD. Resi & commercial. Inspections, repairs, maintenance", created: "2026-01-10" },
+  { id: "ct24", repId: "rep2", company: "619 Roofing", name: "", title: "", phone: "(619) 304-4868", email: "", address: "Riverside / Orange / San Bernardino County, CA", notes: "#1 choice of HOAs, realtors, commercial & resi owners. Tile with 2-layer UDL, 30-yr warranty. 24/7 emergency", created: "2026-02-20" },
+  { id: "ct25", repId: "rep2", company: "Infinity Roofers Inc.", name: "", title: "", phone: "(805) 855-8733", email: "", address: "Ventura / LA / OC / Riverside / San Bernardino", notes: "Resi & commercial. Asphalt shingle, flat, tile & metal roofs. Inspections. Diamond Certified", created: "2026-02-22" },
 
   // ── DISTRIBUTORS — All Counties ──
   { id: "ct26", repId: "rep1", company: "ABC Supply Co. — San Diego", name: "", title: "Branch Manager", phone: "(858) 278-8666", email: "", address: "San Diego, CA", notes: "DISTRIBUTOR — Largest wholesale roofing distributor in US. ~800 branches. Shingles, metal, single-ply, insulation, accessories", created: "2026-01-05" },
@@ -54,7 +54,7 @@ const seedContacts = [
   { id: "ct28", repId: "rep1", company: "QXO / Beacon — San Diego (Kearny Villa)", name: "", title: "Branch Manager", phone: "(858) 279-5444", email: "", address: "5660 Kearny Villa Rd, San Diego, CA 92123", notes: "DISTRIBUTOR — Formerly Beacon Roofing Supply. Full line resi & commercial. Owens Corning, GAF, CertainTeed, Carlisle", created: "2026-01-08" },
   { id: "ct29", repId: "rep1", company: "QXO / Beacon — El Cajon", name: "", title: "Branch Manager", phone: "(619) 258-0022", email: "", address: "396 Raleigh Ave, El Cajon, CA 92020", notes: "DISTRIBUTOR — Serves east SD County: El Cajon, Santee, Lakeside, La Mesa, Spring Valley, Lemon Grove", created: "2026-01-10" },
   { id: "ct30", repId: "rep2", company: "QXO / Beacon — Orange", name: "", title: "Branch Manager", phone: "(714) 289-0044", email: "", address: "675 N Batavia St, Orange, CA 92868", notes: "DISTRIBUTOR — Serves OC: Orange, Santa Ana, Anaheim, Tustin, Huntington Beach, Newport, Costa Mesa, Irvine, Mission Viejo", created: "2026-01-12" },
-  { id: "ct31", repId: "rep3", company: "QXO / Beacon — Norco (Riverside)", name: "", title: "Branch Manager", phone: "(951) 340-0607", email: "", address: "1606 Hamner Ave, Norco, CA 92860", notes: "DISTRIBUTOR — Serves Riverside County & Inland Empire contractors", created: "2026-01-15" },
+  { id: "ct31", repId: "rep2", company: "QXO / Beacon — Norco (Riverside)", name: "", title: "Branch Manager", phone: "(951) 340-0607", email: "", address: "1606 Hamner Ave, Norco, CA 92860", notes: "DISTRIBUTOR — Serves Riverside County & Inland Empire contractors", created: "2026-01-15" },
   { id: "ct32", repId: "rep1", company: "RWC Building Products — Spring Valley", name: "", title: "Branch Manager", phone: "(619) 460-5200", email: "", address: "Spring Valley, CA (San Diego County)", notes: "DISTRIBUTOR — Leading SD County roofing supplier. Resi & commercial materials. Near CA-125. Roofing products only", created: "2026-01-18" },
   { id: "ct33", repId: "rep1", company: "SRS Building Products — San Diego", name: "", title: "Branch Manager", phone: "(858) 549-6959", email: "", address: "San Diego, CA", notes: "DISTRIBUTOR — Part of SRS Distribution (430+ branches nationwide). Asphalt, tile, metal, commercial. Major manufacturers", created: "2026-01-20" },
   { id: "ct34", repId: "rep2", company: "SRS Distribution — Los Angeles", name: "", title: "Branch Manager", phone: "", email: "", address: "Los Angeles, CA", notes: "DISTRIBUTOR — Fastest growing building products distributor in US. Full line roofing from all major manufacturers", created: "2026-01-22" },
@@ -65,7 +65,7 @@ const seedCalls = [
   { id: "cl1", repId: "rep1", contactId: "ct1", date: "2026-03-20", time: "10:00", who: "Eric", what: "Discussed pipe boots and scuppers for a new warehouse project they're bidding. Need TPO wraps for 30+ pipe penetrations and 4 scuppers.", where: "Their office - San Diego", productsDiscussed: "Wraps/Boots/Pipes,Scuppers & Drains", outcome: "Sending quote today", followUp: "Call back Thursday to review pricing" },
   { id: "cl2", repId: "rep1", contactId: "ct7", date: "2026-03-22", time: "14:00", who: "", what: "Interested in our prefab vent flashings and sealant pockets for residential re-roofs. They do a lot of TPO work and want to speed up installs.", where: "Phone call", productsDiscussed: "Vents,Sealant Pockets,Accessories", outcome: "Very interested - wants product catalog and pricing", followUp: "Ship sample kit and full catalog" },
   { id: "cl3", repId: "rep2", contactId: "ct11", date: "2026-03-19", time: "09:00", who: "", what: "Reviewed specs for large mixed-use project. Need custom edge metal, corner pieces, and T-joints. They do massive commercial jobs - potential ongoing account.", where: "Zoom call", productsDiscussed: "Edge Metal,Corners & T-Joints,Custom/Other", outcome: "Sending revised quote with custom specs", followUp: "Follow up Monday on approval" },
-  { id: "cl4", repId: "rep3", contactId: "ct23", date: "2026-03-21", time: "11:30", who: "", what: "They service Riverside, OC, and SD counties. Looking for prefab roof drains and cylindrical split pipe for commercial flat roofs.", where: "Lunch meeting - Temecula", productsDiscussed: "Roof Drains,Cylindrical Split Pipe,Accessories", outcome: "Putting together a contractor package quote", followUp: "Email volume pricing sheet by Friday" },
+  { id: "cl4", repId: "rep2", contactId: "ct23", date: "2026-03-21", time: "11:30", who: "", what: "They service Riverside, OC, and SD counties. Looking for prefab roof drains and cylindrical split pipe for commercial flat roofs.", where: "Lunch meeting - Temecula", productsDiscussed: "Roof Drains,Cylindrical Split Pipe,Accessories", outcome: "Putting together a contractor package quote", followUp: "Email volume pricing sheet by Friday" },
   { id: "cl5", repId: "rep1", contactId: "ct28", date: "2026-03-18", time: "08:30", who: "", what: "Visited their Kearny Villa branch. Discussed getting Flash-Tech products stocked. They carry GAF, CertainTeed, Carlisle - our prefab accessories would complement their line.", where: "Their branch - 5660 Kearny Villa Rd", productsDiscussed: "Vents,Wraps/Boots/Pipes,Scuppers & Drains,Edge Metal", outcome: "They want product spec sheets and pricing matrix", followUp: "Send full product catalog and distributor pricing proposal" },
   { id: "cl6", repId: "rep2", contactId: "ct19", date: "2026-03-17", time: "10:00", who: "", what: "3rd-gen commercial specialist. Interested in our EZ PV Mounts for solar retrofit projects and coping metal for high-rise work.", where: "Phone call", productsDiscussed: "EZ PV Mounts,Coping Metal,Edge Metal", outcome: "Wants to tour our manufacturing facility in El Cajon", followUp: "Schedule plant tour for next week" },
 ];
@@ -75,7 +75,7 @@ const seedTasks = [
   { id: "t2", repId: "rep1", contactId: "ct7", type: "Send Samples", title: "Ship vent flashing sample kit + catalog to Christian Roofing", due: "2026-03-25", priority: "medium", status: "pending", notes: "Include sealant pockets and product spec sheets" },
   { id: "t3", repId: "rep2", contactId: "ct11", type: "Quote Order", title: "Revised quote - custom edge metal & T-joints for Stone Roofing", due: "2026-03-21", priority: "high", status: "overdue", notes: "Mixed-use project, custom corners, confirm 2-3 day ship time" },
   { id: "t4", repId: "rep2", contactId: "ct19", type: "Schedule Meeting", title: "Set up plant tour for CalCom Roofing - El Cajon facility", due: "2026-03-28", priority: "medium", status: "pending", notes: "Show CNC cutting, prefab line, and EZ PV Mount assembly" },
-  { id: "t5", repId: "rep3", contactId: "ct23", type: "Email Information", title: "Email contractor volume pricing to Rocket Roofing", due: "2026-03-24", priority: "high", status: "pending", notes: "Roof drains, cylindrical split pipe, accessories" },
+  { id: "t5", repId: "rep2", contactId: "ct23", type: "Email Information", title: "Email contractor volume pricing to Rocket Roofing", due: "2026-03-24", priority: "high", status: "pending", notes: "Roof drains, cylindrical split pipe, accessories" },
   { id: "t6", repId: "rep1", contactId: "ct28", type: "Send Catalog", title: "Send full product catalog + distributor pricing to QXO/Beacon SD", due: "2026-03-26", priority: "high", status: "pending", notes: "Key distributor - could stock Flash-Tech in their SD branches" },
   { id: "t7", repId: "rep1", contactId: "ct32", type: "Follow Up Call", title: "Follow up with RWC Building Products on stocking agreement", due: "2026-03-27", priority: "medium", status: "pending", notes: "Leading SD County roofing supplier - big distribution opportunity" },
   { id: "t8", repId: "rep2", contactId: "ct12", type: "Quote Order", title: "Quote EZ PV Mounts + coping metal for AAA Roofing", due: "2026-03-29", priority: "medium", status: "pending", notes: "Solar retrofit on commercial building. 150M+ sqft installed - volume account potential" },
@@ -86,7 +86,7 @@ const seedEvents = [
   { id: "ev2", repId: "rep1", date: "2026-03-28", time: "12:00", endTime: "13:30", title: "Lunch meeting - Christian Roofing", type: "meeting", contactId: "ct7", notes: "Bring metal shingle samples" },
   { id: "ev3", repId: "rep2", date: "2026-03-25", time: "10:00", endTime: "11:00", title: "Zoom - Stone Roofing custom specs review", type: "call", contactId: "ct11", notes: "Review revised quote" },
   { id: "ev4", repId: "rep2", date: "2026-03-28", time: "14:00", endTime: "16:00", title: "Plant tour - CalCom Roofing @ El Cajon", type: "meeting", contactId: "ct19", notes: "Show CNC cutting, prefab line, EZ PV Mount assembly" },
-  { id: "ev5", repId: "rep3", date: "2026-03-27", time: "08:00", endTime: "09:00", title: "Site visit - Rocket Roofing jobsite", type: "site_visit", contactId: "ct23", notes: "TPO drain install demo - Temecula area" },
+  { id: "ev5", repId: "rep2", date: "2026-03-27", time: "08:00", endTime: "09:00", title: "Site visit - Rocket Roofing jobsite", type: "site_visit", contactId: "ct23", notes: "TPO drain install demo - Temecula area" },
   { id: "ev6", repId: "rep1", date: "2026-04-02", time: "09:00", endTime: "17:00", title: "Western Roofing Expo - San Diego", type: "trade_show", contactId: "", notes: "Booth 412 - bring full product line samples" },
   { id: "ev7", repId: "rep1", date: "2026-03-31", time: "10:00", endTime: "11:30", title: "QXO/Beacon branch visit - Kearny Villa", type: "meeting", contactId: "ct28", notes: "Present distributor partnership proposal" },
   { id: "ev8", repId: "rep2", date: "2026-04-01", time: "09:00", endTime: "10:00", title: "Call - Guardian Roofs product intro", type: "call", contactId: "ct17", notes: "Introduce Flash Tech metal line to their purchasing team" },
@@ -107,7 +107,7 @@ const seedExpenses = [
   { id: "e1", repId: "rep1", date: "2026-03-19", amount: 85.50, category: "Client Meal", who: "Roofing Specialists of SD", what: "Business lunch - discussed warehouse project standing seam quote", where: "The Capital Grille, San Diego", receipt: true },
   { id: "e2", repId: "rep1", date: "2026-03-21", amount: 249.00, category: "Hotel", who: "Self", what: "Overnight for north county client meetings - Christian Roofing & TAG Roofing", where: "Marriott Oceanside", receipt: true },
   { id: "e3", repId: "rep2", date: "2026-03-20", amount: 42.00, category: "Client Meal", who: "Stone Roofing Company", what: "Coffee meeting to review custom fab specs", where: "Starbucks Reserve, Azusa", receipt: true },
-  { id: "e4", repId: "rep3", date: "2026-03-22", amount: 150.00, category: "Supplies", who: "Self", what: "Sample boards and presentation materials for Rocket Roofing meeting", where: "FedEx Office, Temecula", receipt: true },
+  { id: "e4", repId: "rep2", date: "2026-03-22", amount: 150.00, category: "Supplies", who: "Self", what: "Sample boards and presentation materials for Rocket Roofing meeting", where: "FedEx Office, Temecula", receipt: true },
   { id: "e5", repId: "rep2", date: "2026-03-18", amount: 67.00, category: "Client Meal", who: "CalCom Roofing", what: "Lunch meeting - intro to Flash Tech product line", where: "El Torito, Anaheim", receipt: true },
 ];
 
@@ -486,12 +486,12 @@ function LoginScreen({ onLogin }) {
         <h1>Flash<span style={{fontWeight:800}}>T</span>ech</h1>
         <div className="sub">Sales Assistant</div>
         <p>Sign in to continue</p>
-        <div className="fi"><label>Username</label><input value={e} onChange={v => setE(v.target.value)} placeholder="admin, jake, sarah, or mike" onKeyDown={v => v.key === "Enter" && go()} /></div>
-        <div className="fi" style={{ marginTop: 10 }}><label>Password</label><input type="password" value={p} onChange={v => setP(v.target.value)} placeholder="admin or 1234" onKeyDown={v => v.key === "Enter" && go()} /></div>
+        <div className="fi"><label>Username</label><input value={e} onChange={v => setE(v.target.value)} placeholder="andrew, lee, byron, or marcia" onKeyDown={v => v.key === "Enter" && go()} /></div>
+        <div className="fi" style={{ marginTop: 10 }}><label>Password</label><input type="password" value={p} onChange={v => setP(v.target.value)} placeholder="Enter password" onKeyDown={v => v.key === "Enter" && go()} /></div>
         <button className="btn btn-p" onClick={go}>Sign In</button>
         {err && <div className="le">{err}</div>}
         <div style={{ marginTop: 20, fontSize: 10, color: "var(--text3)", lineHeight: 1.6 }}>
-          <span style={{ fontWeight: 700 }}>Demo Accounts:</span><br />Manager: admin / admin<br />Reps: jake / 1234 · sarah / 1234 · mike / 1234
+          <span style={{ fontWeight: 700 }}>Login Accounts:</span><br />Managers: andrew / 7663 · lee / 7663<br />Reps: byron / Sales1 · marcia / sales2
         </div>
       </div></div>
     </>
