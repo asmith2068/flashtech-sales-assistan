@@ -13,7 +13,6 @@ const TASK_TYPES = ["Quote Order", "Email Information", "Send Samples", "Schedul
 const EXPENSE_CATS = ["Client Meal", "Hotel", "Travel", "Supplies", "Entertainment", "Other"];
 const MAINT_TYPES = ["Oil Change", "Tire Rotation", "Tires", "Brakes", "Repair", "Inspection", "Wash/Detail", "Other"];
 const PRODUCT_LINES = ["Vents", "Wraps/Boots/Pipes", "Scuppers & Drains", "Edge Metal", "Corners & T-Joints", "Sealant Pockets", "Cylindrical Split Pipe", "Coping Metal", "Roof Drains", "EZ PV Mounts", "Accessories", "Custom/Other"];
-const VEHICLES = ["Vehicle 1 - Company Truck", "Vehicle 2 - Company Van", "Vehicle 3 - Company Car", "Personal Vehicle", "Other"];
 
 const seedContacts = [
   // ── SAN DIEGO COUNTY — Roofing Contractors ──
@@ -62,55 +61,17 @@ const seedContacts = [
   { id: "ct35", repId: "rep1", company: "RoofLine Supply & Delivery — San Diego", name: "", title: "Branch Manager", phone: "(619) 284-8611", email: "", address: "San Diego, CA", notes: "DISTRIBUTOR — Local roofing supply. Good selection, competitive pricing. Delivery available", created: "2026-02-01" },
 ];
 
-const seedCalls = [
-  { id: "cl1", repId: "rep1", contactId: "ct1", date: "2026-03-20", time: "10:00", who: "Eric", what: "Discussed pipe boots and scuppers for a new warehouse project they're bidding. Need TPO wraps for 30+ pipe penetrations and 4 scuppers.", where: "Their office - San Diego", productsDiscussed: "Wraps/Boots/Pipes,Scuppers & Drains", outcome: "Sending quote today", followUp: "Call back Thursday to review pricing" },
-  { id: "cl2", repId: "rep1", contactId: "ct7", date: "2026-03-22", time: "14:00", who: "", what: "Interested in our prefab vent flashings and sealant pockets for residential re-roofs. They do a lot of TPO work and want to speed up installs.", where: "Phone call", productsDiscussed: "Vents,Sealant Pockets,Accessories", outcome: "Very interested - wants product catalog and pricing", followUp: "Ship sample kit and full catalog" },
-  { id: "cl3", repId: "rep2", contactId: "ct11", date: "2026-03-19", time: "09:00", who: "", what: "Reviewed specs for large mixed-use project. Need custom edge metal, corner pieces, and T-joints. They do massive commercial jobs - potential ongoing account.", where: "Zoom call", productsDiscussed: "Edge Metal,Corners & T-Joints,Custom/Other", outcome: "Sending revised quote with custom specs", followUp: "Follow up Monday on approval" },
-  { id: "cl4", repId: "rep2", contactId: "ct23", date: "2026-03-21", time: "11:30", who: "", what: "They service Riverside, OC, and SD counties. Looking for prefab roof drains and cylindrical split pipe for commercial flat roofs.", where: "Lunch meeting - Temecula", productsDiscussed: "Roof Drains,Cylindrical Split Pipe,Accessories", outcome: "Putting together a contractor package quote", followUp: "Email volume pricing sheet by Friday" },
-  { id: "cl5", repId: "rep1", contactId: "ct28", date: "2026-03-18", time: "08:30", who: "", what: "Visited their Kearny Villa branch. Discussed getting Flash-Tech products stocked. They carry GAF, CertainTeed, Carlisle - our prefab accessories would complement their line.", where: "Their branch - 5660 Kearny Villa Rd", productsDiscussed: "Vents,Wraps/Boots/Pipes,Scuppers & Drains,Edge Metal", outcome: "They want product spec sheets and pricing matrix", followUp: "Send full product catalog and distributor pricing proposal" },
-  { id: "cl6", repId: "rep2", contactId: "ct19", date: "2026-03-17", time: "10:00", who: "", what: "3rd-gen commercial specialist. Interested in our EZ PV Mounts for solar retrofit projects and coping metal for high-rise work.", where: "Phone call", productsDiscussed: "EZ PV Mounts,Coping Metal,Edge Metal", outcome: "Wants to tour our manufacturing facility in El Cajon", followUp: "Schedule plant tour for next week" },
-];
+const seedCalls = [];
 
-const seedTasks = [
-  { id: "t1", repId: "rep1", contactId: "ct1", type: "Quote Order", title: "Quote TPO wraps for 30+ pipes + 4 scuppers - warehouse project", due: "2026-03-20", priority: "high", status: "overdue", notes: "Include freight to San Diego jobsite" },
-  { id: "t2", repId: "rep1", contactId: "ct7", type: "Send Samples", title: "Ship vent flashing sample kit + catalog to Christian Roofing", due: "2026-03-25", priority: "medium", status: "pending", notes: "Include sealant pockets and product spec sheets" },
-  { id: "t3", repId: "rep2", contactId: "ct11", type: "Quote Order", title: "Revised quote - custom edge metal & T-joints for Stone Roofing", due: "2026-03-21", priority: "high", status: "overdue", notes: "Mixed-use project, custom corners, confirm 2-3 day ship time" },
-  { id: "t4", repId: "rep2", contactId: "ct19", type: "Schedule Meeting", title: "Set up plant tour for CalCom Roofing - El Cajon facility", due: "2026-03-28", priority: "medium", status: "pending", notes: "Show CNC cutting, prefab line, and EZ PV Mount assembly" },
-  { id: "t5", repId: "rep2", contactId: "ct23", type: "Email Information", title: "Email contractor volume pricing to Rocket Roofing", due: "2026-03-24", priority: "high", status: "pending", notes: "Roof drains, cylindrical split pipe, accessories" },
-  { id: "t6", repId: "rep1", contactId: "ct28", type: "Send Catalog", title: "Send full product catalog + distributor pricing to QXO/Beacon SD", due: "2026-03-26", priority: "high", status: "pending", notes: "Key distributor - could stock Flash-Tech in their SD branches" },
-  { id: "t7", repId: "rep1", contactId: "ct32", type: "Follow Up Call", title: "Follow up with RWC Building Products on stocking agreement", due: "2026-03-27", priority: "medium", status: "pending", notes: "Leading SD County roofing supplier - big distribution opportunity" },
-  { id: "t8", repId: "rep2", contactId: "ct12", type: "Quote Order", title: "Quote EZ PV Mounts + coping metal for AAA Roofing", due: "2026-03-29", priority: "medium", status: "pending", notes: "Solar retrofit on commercial building. 150M+ sqft installed - volume account potential" },
-];
+const seedTasks = [];
 
-const seedEvents = [
-  { id: "ev1", repId: "rep1", date: "2026-03-26", time: "09:00", endTime: "10:00", title: "Follow-up call - Roofing Specialists of SD", type: "call", contactId: "ct1", notes: "Review warehouse quote" },
-  { id: "ev2", repId: "rep1", date: "2026-03-28", time: "12:00", endTime: "13:30", title: "Lunch meeting - Christian Roofing", type: "meeting", contactId: "ct7", notes: "Bring metal shingle samples" },
-  { id: "ev3", repId: "rep2", date: "2026-03-25", time: "10:00", endTime: "11:00", title: "Zoom - Stone Roofing custom specs review", type: "call", contactId: "ct11", notes: "Review revised quote" },
-  { id: "ev4", repId: "rep2", date: "2026-03-28", time: "14:00", endTime: "16:00", title: "Plant tour - CalCom Roofing @ El Cajon", type: "meeting", contactId: "ct19", notes: "Show CNC cutting, prefab line, EZ PV Mount assembly" },
-  { id: "ev5", repId: "rep2", date: "2026-03-27", time: "08:00", endTime: "09:00", title: "Site visit - Rocket Roofing jobsite", type: "site_visit", contactId: "ct23", notes: "TPO drain install demo - Temecula area" },
-  { id: "ev6", repId: "rep1", date: "2026-04-02", time: "09:00", endTime: "17:00", title: "Western Roofing Expo - San Diego", type: "trade_show", contactId: "", notes: "Booth 412 - bring full product line samples" },
-  { id: "ev7", repId: "rep1", date: "2026-03-31", time: "10:00", endTime: "11:30", title: "QXO/Beacon branch visit - Kearny Villa", type: "meeting", contactId: "ct28", notes: "Present distributor partnership proposal" },
-  { id: "ev8", repId: "rep2", date: "2026-04-01", time: "09:00", endTime: "10:00", title: "Call - Guardian Roofs product intro", type: "call", contactId: "ct17", notes: "Introduce Flash Tech metal line to their purchasing team" },
-];
+const seedEvents = [];
 
-const seedFuel = [
-  { id: "f1", repId: "rep1", date: "2026-03-18", gallons: 12.5, pricePerGal: 3.89, total: 48.63, mileage: 45230, station: "Shell - Main St" },
-  { id: "f2", repId: "rep1", date: "2026-03-22", gallons: 14.2, pricePerGal: 3.95, total: 56.09, mileage: 45612, station: "Chevron - Hwy 101" },
-  { id: "f3", repId: "rep2", date: "2026-03-20", gallons: 11.8, pricePerGal: 3.79, total: 44.72, mileage: 32100, station: "BP - Oak Ave" },
-];
+const seedFuel = [];
 
-const seedMaint = [
-  { id: "m1", repId: "rep1", date: "2026-03-15", type: "Oil Change", cost: 65.00, mileage: 45100, vendor: "Jiffy Lube", notes: "Full synthetic" },
-  { id: "m2", repId: "rep2", date: "2026-03-10", type: "Tire Rotation", cost: 40.00, mileage: 31800, vendor: "Discount Tire", notes: "" },
-];
+const seedMaint = [];
 
-const seedExpenses = [
-  { id: "e1", repId: "rep1", date: "2026-03-19", amount: 85.50, category: "Client Meal", who: "Roofing Specialists of SD", what: "Business lunch - discussed warehouse project standing seam quote", where: "The Capital Grille, San Diego", receipt: true },
-  { id: "e2", repId: "rep1", date: "2026-03-21", amount: 249.00, category: "Hotel", who: "Self", what: "Overnight for north county client meetings - Christian Roofing & TAG Roofing", where: "Marriott Oceanside", receipt: true },
-  { id: "e3", repId: "rep2", date: "2026-03-20", amount: 42.00, category: "Client Meal", who: "Stone Roofing Company", what: "Coffee meeting to review custom fab specs", where: "Starbucks Reserve, Azusa", receipt: true },
-  { id: "e4", repId: "rep2", date: "2026-03-22", amount: 150.00, category: "Supplies", who: "Self", what: "Sample boards and presentation materials for Rocket Roofing meeting", where: "FedEx Office, Temecula", receipt: true },
-  { id: "e5", repId: "rep2", date: "2026-03-18", amount: 67.00, category: "Client Meal", who: "CalCom Roofing", what: "Lunch meeting - intro to Flash Tech product line", where: "El Torito, Anaheim", receipt: true },
-];
+const seedExpenses = [];
 
 // ─── UTILITY ─────────────────────────────────────────────────
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -340,22 +301,37 @@ const Modal = ({ title, onClose, children, footer }) => (
 // ═════════════════════════════════════════════════════════════
 // MAIN APP
 // ═════════════════════════════════════════════════════════════
+const LS = (key, fallback) => { try { const v = localStorage.getItem("ft_" + key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } };
+const SS = (key, val) => { try { localStorage.setItem("ft_" + key, JSON.stringify(val)); } catch {} };
+
 export default function App() {
   const [user, setUser] = useState(null);
-  const [users, setUsers] = useState(INITIAL_USERS);
-  const [contacts, setContacts] = useState(seedContacts);
-  const [calls, setCalls] = useState(seedCalls);
-  const [tasks, setTasks] = useState(seedTasks);
-  const [events, setEvents] = useState(seedEvents);
-  const [fuel, setFuel] = useState(seedFuel);
-  const [maint, setMaint] = useState(seedMaint);
-  const [expenses, setExpenses] = useState(seedExpenses);
+  const [users, setUsers] = useState(() => LS("users", INITIAL_USERS));
+  const [contacts, setContacts] = useState(() => LS("contacts", seedContacts));
+  const [calls, setCalls] = useState(() => LS("calls", seedCalls));
+  const [tasks, setTasks] = useState(() => LS("tasks", seedTasks));
+  const [events, setEvents] = useState(() => LS("events", seedEvents));
+  const [fuel, setFuel] = useState(() => LS("fuel", seedFuel));
+  const [maint, setMaint] = useState(() => LS("maint", seedMaint));
+  const [expenses, setExpenses] = useState(() => LS("expenses", seedExpenses));
+  const [vehicles, setVehicles] = useState(() => LS("vehicles", ["Vehicle 1", "Vehicle 2", "Vehicle 3", "Personal Vehicle"]));
   const [page, setPage] = useState("dashboard");
   const [modal, setModal] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [mgrView, setMgrView] = useState("all");
   const [showNotifs, setShowNotifs] = useState(false);
   const [reportRange, setReportRange] = useState("weekly");
+
+  // ── PERSIST TO LOCALSTORAGE ──
+  useEffect(() => { SS("users", users); }, [users]);
+  useEffect(() => { SS("contacts", contacts); }, [contacts]);
+  useEffect(() => { SS("calls", calls); }, [calls]);
+  useEffect(() => { SS("tasks", tasks); }, [tasks]);
+  useEffect(() => { SS("events", events); }, [events]);
+  useEffect(() => { SS("fuel", fuel); }, [fuel]);
+  useEffect(() => { SS("maint", maint); }, [maint]);
+  useEffect(() => { SS("expenses", expenses); }, [expenses]);
+  useEffect(() => { SS("vehicles", vehicles); }, [vehicles]);
 
   const my = useCallback((arr) => {
     if (!user) return [];
@@ -374,6 +350,7 @@ export default function App() {
   const getContact = (id) => contacts.find(c => c.id === id);
   const getContactName = (id) => { const c = getContact(id); return c ? c.company : "—"; };
   const getRep = (id) => users.find(u => u.id === id)?.name || "—";
+  const reps = users.filter(u => u.role === "rep");
   const isRep = user.role === "rep";
   const isMgr = user.role === "manager";
 
@@ -384,12 +361,22 @@ export default function App() {
     const setters = { contact: setContacts, call: setCalls, task: setTasks, event: setEvents, fuel: setFuel, maint: setMaint, expense: setExpenses };
     const setter = setters[type];
     if (data.id) setter(p => p.map(i => i.id === data.id ? data : i));
-    else setter(p => [...p, { ...data, id: uid(), repId: user.id, ...(type === "contact" ? { created: today() } : {}) }]);
+    else {
+      const repId = data._assignTo || user.id;
+      const clean = { ...data, id: uid(), repId, ...(type === "contact" ? { created: today() } : {}) };
+      delete clean._assignTo;
+      setter(p => [...p, clean]);
+    }
     close();
   };
   const saveTask = (data) => {
     if (data.id) setTasks(p => p.map(t => t.id === data.id ? data : t));
-    else setTasks(p => [...p, { ...data, id: uid(), repId: user.id, status: "pending" }]);
+    else {
+      const repId = data._assignTo || user.id;
+      const clean = { ...data, id: uid(), repId, status: "pending" };
+      delete clean._assignTo;
+      setTasks(p => [...p, clean]);
+    }
   };
   const del = (type, id) => {
     const setters = { contact: setContacts, call: setCalls, task: setTasks, event: setEvents, fuel: setFuel, maint: setMaint, expense: setExpenses };
@@ -402,6 +389,8 @@ export default function App() {
     close();
   };
   const delUser = (id) => setUsers(p => p.filter(u => u.id !== id));
+  const saveVehicle = (v) => { setVehicles(p => [...p, v]); };
+  const delVehicle = (v) => { setVehicles(p => p.filter(x => x !== v)); };
 
   const navItems = [
     { s: "MAIN" },
@@ -423,13 +412,13 @@ export default function App() {
     switch (page) {
       case "dashboard": return <Dashboard user={user} contacts={my(contacts)} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} overdue={myOverdue} setPage={setPage} getContactName={getContactName} getRep={getRep} />;
       case "contacts": return <Contacts contacts={my(contacts)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("contact")} onEdit={c => open("contact", c)} onDel={id => del("contact", id)} />;
-      case "calls": return <Calls calls={my(calls)} contacts={my(contacts)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("call")} onEdit={c => open("call", c)} onDel={id => del("call", id)} />;
+      case "calls": return <Calls calls={my(calls)} contacts={contacts} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("call")} onEdit={c => open("call", c)} onDel={id => del("call", id)} />;
       case "tasks": return <Tasks tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("task")} onEdit={t => open("task", t)} onToggle={toggleTask} onDel={id => del("task", id)} />;
-      case "calendar": return <Calendar events={my(events)} tasks={my(tasks)} isRep={isRep} getContactName={getContactName} onAdd={() => open("event")} onEdit={e => open("event", e)} />;
-      case "vehicle": return <Vehicle fuel={my(fuel)} maint={my(maint)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAddF={() => open("fuel")} onAddM={() => open("maint")} onEditF={f => open("fuel", f)} onEditM={m => open("maint", m)} />;
-      case "expenses": return <Expenses expenses={my(expenses)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("expense")} onEdit={e => open("expense", e)} />;
+      case "calendar": return <Calendar events={my(events)} tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} onAdd={() => open("event")} onEdit={e => open("event", e)} />;
+      case "vehicle": return <Vehicle fuel={my(fuel)} maint={my(maint)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAddF={() => open("fuel")} onAddM={() => open("maint")} onEditF={f => open("fuel", f)} onEditM={m => open("maint", m)} onDelF={id => del("fuel", id)} onDelM={id => del("maint", id)} />;
+      case "expenses": return <Expenses expenses={my(expenses)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("expense")} onEdit={e => open("expense", e)} onDel={id => del("expense", id)} />;
       case "team": return isMgr ? <Team users={users} tasks={tasks} contacts={contacts} calls={calls} expenses={expenses} fuel={fuel} maint={maint} mgrView={mgrView} setMgrView={setMgrView} setPage={setPage} /> : null;
-      case "admin": return isMgr ? <AdminPage users={users} onEdit={u => open("user", u)} onAdd={() => open("user")} onDel={delUser} /> : null;
+      case "admin": return isMgr ? <AdminPage users={users} vehicles={vehicles} onEdit={u => open("user", u)} onAdd={() => open("user")} onDel={delUser} onAddVehicle={saveVehicle} onDelVehicle={delVehicle} /> : null;
       case "reports": return <Reports user={user} contacts={my(contacts)} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} getContactName={getContactName} getRep={getRep} range={reportRange} setRange={setReportRange} />;
       default: return null;
     }
@@ -478,13 +467,13 @@ export default function App() {
         </div>
       </div>
 
-      {modal === "contact" && <ContactForm item={editItem} onSave={d => save("contact", d)} onClose={close} />}
-      {modal === "call" && <CallForm item={editItem} contacts={my(contacts)} onSave={d => save("call", d)} onSaveTask={saveTask} onClose={close} />}
-      {modal === "task" && <TaskForm item={editItem} contacts={my(contacts)} onSave={d => save("task", d)} onClose={close} />}
-      {modal === "event" && <EventForm item={editItem} contacts={my(contacts)} onSave={d => save("event", d)} onClose={close} />}
-      {modal === "fuel" && <FuelForm item={editItem} onSave={d => save("fuel", d)} onClose={close} />}
-      {modal === "maint" && <MaintForm item={editItem} onSave={d => save("maint", d)} onClose={close} />}
-      {modal === "expense" && <ExpenseForm item={editItem} onSave={d => save("expense", d)} onClose={close} />}
+      {modal === "contact" && <ContactForm item={editItem} isMgr={isMgr} reps={reps} onSave={d => save("contact", d)} onClose={close} />}
+      {modal === "call" && <CallForm item={editItem} contacts={contacts} isMgr={isMgr} reps={reps} onSave={d => save("call", d)} onSaveTask={saveTask} onClose={close} />}
+      {modal === "task" && <TaskForm item={editItem} contacts={contacts} isMgr={isMgr} reps={reps} onSave={d => save("task", d)} onClose={close} />}
+      {modal === "event" && <EventForm item={editItem} contacts={contacts} isMgr={isMgr} reps={reps} onSave={d => save("event", d)} onClose={close} />}
+      {modal === "fuel" && <FuelForm item={editItem} vehicles={vehicles} isMgr={isMgr} reps={reps} onSave={d => save("fuel", d)} onClose={close} />}
+      {modal === "maint" && <MaintForm item={editItem} vehicles={vehicles} isMgr={isMgr} reps={reps} onSave={d => save("maint", d)} onClose={close} />}
+      {modal === "expense" && <ExpenseForm item={editItem} isMgr={isMgr} reps={reps} onSave={d => save("expense", d)} onClose={close} />}
       {modal === "user" && <UserForm item={editItem} onSave={saveUser} onClose={close} />}
     </>
   );
@@ -581,7 +570,7 @@ function Contacts({ contacts, isRep, isMgr, getRep, onAdd, onEdit, onDel }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14, gap: 8, flexWrap: "wrap" }}>
         <input placeholder="Search contacts..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: 260 }} />
-        {isRep && <button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Add Contact</button>}
+        <button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Add Contact</button>
       </div>
       <div className="tw">
         <table>
@@ -597,7 +586,7 @@ function Contacts({ contacts, isRep, isMgr, getRep, onAdd, onEdit, onDel }) {
                 <td style={{ fontSize: 11, maxWidth: 180, color: "var(--text2)" }}>{c.notes}</td>
                 <td>
                   <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(c)}><I d={IC.edit} s={12} /></button>
-                  {isRep && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => onDel(c.id)}><I d={IC.trash} s={12} /></button>}
+                  {(isRep || isMgr) && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => onDel(c.id)}><I d={IC.trash} s={12} /></button>}
                 </td>
               </tr>
             ))}
@@ -614,7 +603,7 @@ function Contacts({ contacts, isRep, isMgr, getRep, onAdd, onEdit, onDel }) {
 function Calls({ calls, contacts, isRep, isMgr, getContactName, getRep, onAdd, onEdit, onDel }) {
   return (
     <div>
-      {isRep && <div style={{ marginBottom: 14 }}><button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Log Sales Call</button></div>}
+      {(isRep || isMgr) && <div style={{ marginBottom: 14 }}><button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Log Sales Call</button></div>}
       <div className="tw">
         <table>
           <thead><tr><th>Date</th><th>Time</th>{isMgr && <th>Rep</th>}<th>Company</th><th>Spoke With</th><th>Where</th><th>Products</th><th>Discussion</th><th>Outcome</th><th>Follow Up</th><th></th></tr></thead>
@@ -661,7 +650,7 @@ function Tasks({ tasks, isRep, isMgr, getContactName, getRep, onAdd, onEdit, onT
         <div className="tabs">
           {["all", "pending", "overdue", "done"].map(f => <div key={f} className={`tab ${filter === f ? "act" : ""}`} onClick={() => setFilter(f)}>{f.charAt(0).toUpperCase() + f.slice(1)}</div>)}
         </div>
-        {isRep && <button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> New Task</button>}
+        {(isRep || isMgr) && <button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> New Task</button>}
       </div>
       <div className="tw">
         <table>
@@ -693,7 +682,7 @@ function Tasks({ tasks, isRep, isMgr, getContactName, getRep, onAdd, onEdit, onT
 // ═════════════════════════════════════════════════════════════
 // CALENDAR
 // ═════════════════════════════════════════════════════════════
-function Calendar({ events, tasks, isRep, getContactName, onAdd, onEdit }) {
+function Calendar({ events, tasks, isRep, isMgr, getContactName, onAdd, onEdit }) {
   const [current, setCurrent] = useState(new Date());
   const year = current.getFullYear();
   const month = current.getMonth();
@@ -725,7 +714,7 @@ function Calendar({ events, tasks, isRep, getContactName, onAdd, onEdit }) {
           <button className="btn btn-g btn-ic" onClick={() => setCurrent(new Date(year, month + 1))}><I d={IC.chevR} s={14} /></button>
           <button className="btn btn-g btn-sm" onClick={() => setCurrent(new Date())}>Today</button>
         </div>
-        {isRep && <button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Add Event</button>}
+        {(isRep || isMgr) && <button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Add Event</button>}
       </div>
       <div style={{ display: "flex", gap: 12, marginBottom: 12, fontSize: 10, color: "var(--text3)" }}>
         <span><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: "var(--accent)", marginRight: 4 }} />Call</span>
@@ -756,7 +745,7 @@ function Calendar({ events, tasks, isRep, getContactName, onAdd, onEdit }) {
 // ═════════════════════════════════════════════════════════════
 // VEHICLE & GAS
 // ═════════════════════════════════════════════════════════════
-function Vehicle({ fuel, maint, isRep, isMgr, getRep, onAddF, onAddM, onEditF, onEditM }) {
+function Vehicle({ fuel, maint, isRep, isMgr, getRep, onAddF, onAddM, onEditF, onEditM, onDelF, onDelM }) {
   const [tab, setTab] = useState("fuel");
   const totalF = fuel.reduce((s, f) => s + f.total, 0);
   const totalM = maint.reduce((s, m) => s + m.cost, 0);
@@ -776,20 +765,20 @@ function Vehicle({ fuel, maint, isRep, isMgr, getRep, onAddF, onAddM, onEditF, o
           <div className={`tab ${tab === "fuel" ? "act" : ""}`} onClick={() => setTab("fuel")}>Fuel Log</div>
           <div className={`tab ${tab === "maint" ? "act" : ""}`} onClick={() => setTab("maint")}>Maintenance & Other</div>
         </div>
-        {isRep && (tab === "fuel" ? <button className="btn btn-p" onClick={onAddF}><I d={IC.plus} s={13} /> Add Fuel</button> : <button className="btn btn-p" onClick={onAddM}><I d={IC.plus} s={13} /> Add Expense</button>)}
+        {(isRep || isMgr) && (tab === "fuel" ? <button className="btn btn-p" onClick={onAddF}><I d={IC.plus} s={13} /> Add Fuel</button> : <button className="btn btn-p" onClick={onAddM}><I d={IC.plus} s={13} /> Add Expense</button>)}
       </div>
       {tab === "fuel" ? (
         <div className="tw"><table>
           <thead><tr><th>Date</th>{isMgr && <th>Rep</th>}<th>Vehicle</th><th>Station</th><th>Gallons</th><th>$/Gal</th><th>Total</th><th>Mileage</th><th></th></tr></thead>
           <tbody>{fuel.sort((a, b) => b.date.localeCompare(a.date)).map(f => (
-            <tr key={f.id}><td>{fmtShort(f.date)}</td>{isMgr && <td>{getRep(f.repId)}</td>}<td style={{ fontSize: 11 }}>{f.vehicleId || "—"}</td><td>{f.station}</td><td>{f.gallons}</td><td>${Number(f.pricePerGal).toFixed(2)}</td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(f.total)}</td><td>{Number(f.mileage).toLocaleString()}</td><td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEditF(f)}><I d={IC.edit} s={12} /></button></td></tr>
+            <tr key={f.id}><td>{fmtShort(f.date)}</td>{isMgr && <td>{getRep(f.repId)}</td>}<td style={{ fontSize: 11 }}>{f.vehicleId || "—"}</td><td>{f.station}</td><td>{f.gallons}</td><td>${Number(f.pricePerGal).toFixed(2)}</td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(f.total)}</td><td>{Number(f.mileage).toLocaleString()}</td><td style={{ whiteSpace: "nowrap" }}><button className="btn btn-g btn-sm btn-ic" onClick={() => onEditF(f)}><I d={IC.edit} s={12} /></button>{isMgr && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => { if (confirm("Delete this fuel entry?")) onDelF(f.id); }}><I d={IC.trash} s={12} /></button>}</td></tr>
           ))}</tbody>
         </table></div>
       ) : (
         <div className="tw"><table>
           <thead><tr><th>Date</th>{isMgr && <th>Rep</th>}<th>Vehicle</th><th>Type</th><th>Vendor</th><th>Cost</th><th>Mileage</th><th>Notes</th><th></th></tr></thead>
           <tbody>{maint.sort((a, b) => b.date.localeCompare(a.date)).map(m => (
-            <tr key={m.id}><td>{fmtShort(m.date)}</td>{isMgr && <td>{getRep(m.repId)}</td>}<td style={{ fontSize: 11 }}>{m.vehicleId || "—"}</td><td style={{ fontWeight: 600 }}>{m.type}</td><td>{m.vendor}</td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(m.cost)}</td><td>{Number(m.mileage).toLocaleString()}</td><td style={{ fontSize: 11 }}>{m.notes}</td><td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEditM(m)}><I d={IC.edit} s={12} /></button></td></tr>
+            <tr key={m.id}><td>{fmtShort(m.date)}</td>{isMgr && <td>{getRep(m.repId)}</td>}<td style={{ fontSize: 11 }}>{m.vehicleId || "—"}</td><td style={{ fontWeight: 600 }}>{m.type}</td><td>{m.vendor}</td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(m.cost)}</td><td>{Number(m.mileage).toLocaleString()}</td><td style={{ fontSize: 11 }}>{m.notes}</td><td style={{ whiteSpace: "nowrap" }}><button className="btn btn-g btn-sm btn-ic" onClick={() => onEditM(m)}><I d={IC.edit} s={12} /></button>{isMgr && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => { if (confirm("Delete this maintenance entry?")) onDelM(m.id); }}><I d={IC.trash} s={12} /></button>}</td></tr>
           ))}</tbody>
         </table></div>
       )}
@@ -800,7 +789,7 @@ function Vehicle({ fuel, maint, isRep, isMgr, getRep, onAddF, onAddM, onEditF, o
 // ═════════════════════════════════════════════════════════════
 // EXPENSES
 // ═════════════════════════════════════════════════════════════
-function Expenses({ expenses, isRep, isMgr, getRep, onAdd, onEdit }) {
+function Expenses({ expenses, isRep, isMgr, getRep, onAdd, onEdit, onDel }) {
   const total = expenses.reduce((s, e) => s + e.amount, 0);
   const cats = [...new Set(expenses.map(e => e.category))];
   return (
@@ -809,11 +798,11 @@ function Expenses({ expenses, isRep, isMgr, getRep, onAdd, onEdit }) {
         <div className="st"><div className="lb">Total Expenses</div><div className="vl" style={{ color: "var(--orange)" }}>{fmt(total)}</div><div className="su">{expenses.length} entries</div></div>
         {cats.map(cat => <div className="st" key={cat}><div className="lb">{cat}</div><div className="vl">{fmt(expenses.filter(e => e.category === cat).reduce((s, e) => s + e.amount, 0))}</div></div>)}
       </div>
-      {isRep && <div style={{ marginBottom: 14 }}><button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Add Expense</button></div>}
+      {(isRep || isMgr) && <div style={{ marginBottom: 14 }}><button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Add Expense</button></div>}
       <div className="tw"><table>
         <thead><tr><th>Date</th>{isMgr && <th>Rep</th>}<th>Category</th><th>Amount</th><th>Who</th><th>What</th><th>Where</th><th>Receipt</th><th></th></tr></thead>
         <tbody>{expenses.sort((a, b) => b.date.localeCompare(a.date)).map(e => (
-          <tr key={e.id}><td>{fmtShort(e.date)}</td>{isMgr && <td>{getRep(e.repId)}</td>}<td><span className="bg bg-pp">{e.category}</span></td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(e.amount)}</td><td>{e.who}</td><td>{e.what}</td><td>{e.where}</td><td>{e.receipt ? <span className="bg bg-gr">Yes</span> : <span className="bg bg-rd">No</span>}</td><td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(e)}><I d={IC.edit} s={12} /></button></td></tr>
+          <tr key={e.id}><td>{fmtShort(e.date)}</td>{isMgr && <td>{getRep(e.repId)}</td>}<td><span className="bg bg-pp">{e.category}</span></td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(e.amount)}</td><td>{e.who}</td><td>{e.what}</td><td>{e.where}</td><td>{e.receipt ? <span className="bg bg-gr">Yes</span> : <span className="bg bg-rd">No</span>}</td><td style={{ whiteSpace: "nowrap" }}><button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(e)}><I d={IC.edit} s={12} /></button>{isMgr && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => { if (confirm("Delete this expense?")) onDel(e.id); }}><I d={IC.trash} s={12} /></button>}</td></tr>
         ))}</tbody>
       </table></div>
     </div>
@@ -899,12 +888,13 @@ function Reports({ user, contacts, calls, tasks, events, fuel, maint, expenses, 
 // ═════════════════════════════════════════════════════════════
 // FORM MODALS
 // ═════════════════════════════════════════════════════════════
-function ContactForm({ item, onSave, onClose }) {
-  const [f, setF] = useState(item || { company: "", name: "", title: "", phone: "", email: "", address: "", notes: "" });
+function ContactForm({ item, isMgr, reps, onSave, onClose }) {
+  const [f, setF] = useState(item || { company: "", name: "", title: "", phone: "", email: "", address: "", notes: "", _assignTo: reps[0]?.id || "" });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
   return (
     <Modal title={item ? "Edit Contact" : "Add Contact"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave(f)}>Save</button></>}>
       <div className="fg">
+        {isMgr && !item && <div className="fi full"><label>Assign to Rep</label><select value={f._assignTo} onChange={e => u("_assignTo", e.target.value)}>{reps.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>}
         <div className="fi"><label>Company Name</label><input value={f.company} onChange={e => u("company", e.target.value)} /></div>
         <div className="fi"><label>Contact Person</label><input value={f.name} onChange={e => u("name", e.target.value)} /></div>
         <div className="fi"><label>Title</label><input value={f.title} onChange={e => u("title", e.target.value)} placeholder="Purchasing Mgr, Owner..." /></div>
@@ -917,8 +907,8 @@ function ContactForm({ item, onSave, onClose }) {
   );
 }
 
-function CallForm({ item, contacts, onSave, onSaveTask, onClose }) {
-  const [f, setF] = useState(item || { contactId: contacts[0]?.id || "", date: today(), time: "", who: "", what: "", where: "", productsDiscussed: "", outcome: "", followUp: "" });
+function CallForm({ item, contacts, isMgr, reps, onSave, onSaveTask, onClose }) {
+  const [f, setF] = useState(item || { contactId: contacts[0]?.id || "", date: today(), time: "", who: "", what: "", where: "", productsDiscussed: "", outcome: "", followUp: "", _assignTo: reps[0]?.id || "" });
   const [addTask, setAddTask] = useState(false);
   const [task, setTask] = useState({ type: "Follow Up Call", title: "", due: "", priority: "medium", notes: "" });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
@@ -926,12 +916,13 @@ function CallForm({ item, contacts, onSave, onSaveTask, onClose }) {
   const handleSave = () => {
     onSave(f);
     if (addTask && task.title && task.due) {
-      onSaveTask({ ...task, contactId: f.contactId, status: "pending" });
+      onSaveTask({ ...task, contactId: f.contactId, status: "pending", _assignTo: f._assignTo });
     }
   };
   return (
     <Modal title={item ? "Edit Sales Call" : "Log Sales Call"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={handleSave}>Save</button></>}>
       <div className="fg">
+        {isMgr && !item && <div className="fi full"><label>Assign to Rep</label><select value={f._assignTo} onChange={e => u("_assignTo", e.target.value)}>{reps.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>}
         <div className="fi"><label>Company</label><select value={f.contactId} onChange={e => { u("contactId", e.target.value); const c = contacts.find(x => x.id === e.target.value); if (c) u("who", c.name); }}>{contacts.map(c => <option key={c.id} value={c.id}>{c.company}</option>)}</select></div>
         <div className="fi"><label>Spoke With</label><input value={f.who} onChange={e => u("who", e.target.value)} placeholder="Contact name" /></div>
         <div className="fi"><label>Date</label><input type="date" value={f.date} onChange={e => u("date", e.target.value)} /></div>
@@ -971,12 +962,13 @@ function CallForm({ item, contacts, onSave, onSaveTask, onClose }) {
   );
 }
 
-function TaskForm({ item, contacts, onSave, onClose }) {
-  const [f, setF] = useState(item || { contactId: contacts[0]?.id || "", type: "Quote Order", title: "", due: today(), priority: "medium", notes: "" });
+function TaskForm({ item, contacts, isMgr, reps, onSave, onClose }) {
+  const [f, setF] = useState(item || { contactId: contacts[0]?.id || "", type: "Quote Order", title: "", due: today(), priority: "medium", notes: "", _assignTo: reps[0]?.id || "" });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
   return (
     <Modal title={item ? "Edit Task" : "New Task"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave(f)}>Save</button></>}>
       <div className="fg">
+        {isMgr && !item && <div className="fi full"><label>Assign to Rep</label><select value={f._assignTo} onChange={e => u("_assignTo", e.target.value)}>{reps.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>}
         <div className="fi"><label>Type</label><select value={f.type} onChange={e => u("type", e.target.value)}>{TASK_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
         <div className="fi"><label>Company</label><select value={f.contactId} onChange={e => u("contactId", e.target.value)}>{contacts.map(c => <option key={c.id} value={c.id}>{c.company}</option>)}</select></div>
         <div className="fi full"><label>Task Description</label><input value={f.title} onChange={e => u("title", e.target.value)} placeholder="What needs to be done..." /></div>
@@ -988,12 +980,13 @@ function TaskForm({ item, contacts, onSave, onClose }) {
   );
 }
 
-function EventForm({ item, contacts, onSave, onClose }) {
-  const [f, setF] = useState(item || { date: today(), time: "09:00", endTime: "10:00", title: "", type: "call", contactId: "", notes: "" });
+function EventForm({ item, contacts, isMgr, reps, onSave, onClose }) {
+  const [f, setF] = useState(item || { date: today(), time: "09:00", endTime: "10:00", title: "", type: "call", contactId: "", notes: "", _assignTo: reps[0]?.id || "" });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
   return (
     <Modal title={item ? "Edit Event" : "Add Event"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave(f)}>Save</button></>}>
       <div className="fg">
+        {isMgr && !item && <div className="fi full"><label>Assign to Rep</label><select value={f._assignTo} onChange={e => u("_assignTo", e.target.value)}>{reps.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>}
         <div className="fi full"><label>Event Title</label><input value={f.title} onChange={e => u("title", e.target.value)} placeholder="Meeting with..." /></div>
         <div className="fi"><label>Type</label><select value={f.type} onChange={e => u("type", e.target.value)}><option value="call">Call</option><option value="meeting">Meeting</option><option value="site_visit">Site Visit</option><option value="trade_show">Trade Show</option></select></div>
         <div className="fi"><label>Company (optional)</label><select value={f.contactId} onChange={e => u("contactId", e.target.value)}><option value="">— None —</option>{contacts.map(c => <option key={c.id} value={c.id}>{c.company}</option>)}</select></div>
@@ -1006,13 +999,14 @@ function EventForm({ item, contacts, onSave, onClose }) {
   );
 }
 
-function FuelForm({ item, onSave, onClose }) {
-  const [f, setF] = useState(item || { date: today(), gallons: "", pricePerGal: "", total: "", mileage: "", station: "", vehicleId: VEHICLES[0] });
+function FuelForm({ item, vehicles, isMgr, reps, onSave, onClose }) {
+  const [f, setF] = useState(item || { date: today(), gallons: "", pricePerGal: "", total: "", mileage: "", station: "", vehicleId: vehicles[0] || "", _assignTo: reps[0]?.id || "" });
   const u = (k, v) => { const n = { ...f, [k]: v }; if ((k === "gallons" || k === "pricePerGal") && n.gallons && n.pricePerGal) n.total = (parseFloat(n.gallons) * parseFloat(n.pricePerGal)).toFixed(2); setF(n); };
   return (
     <Modal title={item ? "Edit Fuel Entry" : "Add Fuel Entry"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave({ ...f, gallons: +f.gallons, pricePerGal: +f.pricePerGal, total: +f.total, mileage: +f.mileage })}>Save</button></>}>
       <div className="fg">
-        <div className="fi"><label>Vehicle</label><select value={f.vehicleId} onChange={e => u("vehicleId", e.target.value)}>{VEHICLES.map(v => <option key={v}>{v}</option>)}</select></div>
+        {isMgr && !item && <div className="fi full"><label>Assign to Rep</label><select value={f._assignTo} onChange={e => u("_assignTo", e.target.value)}>{reps.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>}
+        <div className="fi"><label>Vehicle</label><select value={f.vehicleId} onChange={e => u("vehicleId", e.target.value)}>{vehicles.map(v => <option key={v}>{v}</option>)}</select></div>
         <div className="fi"><label>Date</label><input type="date" value={f.date} onChange={e => u("date", e.target.value)} /></div>
         <div className="fi"><label>Station</label><input value={f.station} onChange={e => u("station", e.target.value)} /></div>
         <div className="fi"><label>Current Mileage</label><input type="number" value={f.mileage} onChange={e => u("mileage", e.target.value)} /></div>
@@ -1024,13 +1018,14 @@ function FuelForm({ item, onSave, onClose }) {
   );
 }
 
-function MaintForm({ item, onSave, onClose }) {
-  const [f, setF] = useState(item || { date: today(), type: "Oil Change", cost: "", mileage: "", vendor: "", notes: "", vehicleId: VEHICLES[0] });
+function MaintForm({ item, vehicles, isMgr, reps, onSave, onClose }) {
+  const [f, setF] = useState(item || { date: today(), type: "Oil Change", cost: "", mileage: "", vendor: "", notes: "", vehicleId: vehicles[0] || "", _assignTo: reps[0]?.id || "" });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
   return (
     <Modal title={item ? "Edit Vehicle Expense" : "Add Vehicle Expense"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave({ ...f, cost: +f.cost, mileage: +f.mileage })}>Save</button></>}>
       <div className="fg">
-        <div className="fi"><label>Vehicle</label><select value={f.vehicleId} onChange={e => u("vehicleId", e.target.value)}>{VEHICLES.map(v => <option key={v}>{v}</option>)}</select></div>
+        {isMgr && !item && <div className="fi full"><label>Assign to Rep</label><select value={f._assignTo} onChange={e => u("_assignTo", e.target.value)}>{reps.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>}
+        <div className="fi"><label>Vehicle</label><select value={f.vehicleId} onChange={e => u("vehicleId", e.target.value)}>{vehicles.map(v => <option key={v}>{v}</option>)}</select></div>
         <div className="fi"><label>Date</label><input type="date" value={f.date} onChange={e => u("date", e.target.value)} /></div>
         <div className="fi"><label>Type</label><select value={f.type} onChange={e => u("type", e.target.value)}>{MAINT_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
         <div className="fi"><label>Cost ($)</label><input type="number" step="0.01" value={f.cost} onChange={e => u("cost", e.target.value)} /></div>
@@ -1042,12 +1037,13 @@ function MaintForm({ item, onSave, onClose }) {
   );
 }
 
-function ExpenseForm({ item, onSave, onClose }) {
-  const [f, setF] = useState(item || { date: today(), amount: "", category: "Client Meal", who: "", what: "", where: "", receipt: true });
+function ExpenseForm({ item, isMgr, reps, onSave, onClose }) {
+  const [f, setF] = useState(item || { date: today(), amount: "", category: "Client Meal", who: "", what: "", where: "", receipt: true, _assignTo: reps[0]?.id || "" });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
   return (
     <Modal title={item ? "Edit Expense" : "Add Expense"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave({ ...f, amount: +f.amount })}>Save</button></>}>
       <div className="fg">
+        {isMgr && !item && <div className="fi full"><label>Assign to Rep</label><select value={f._assignTo} onChange={e => u("_assignTo", e.target.value)}>{reps.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>}
         <div className="fi"><label>Date</label><input type="date" value={f.date} onChange={e => u("date", e.target.value)} /></div>
         <div className="fi"><label>Amount ($)</label><input type="number" step="0.01" value={f.amount} onChange={e => u("amount", e.target.value)} /></div>
         <div className="fi"><label>Category</label><select value={f.category} onChange={e => u("category", e.target.value)}>{EXPENSE_CATS.map(c => <option key={c}>{c}</option>)}</select></div>
@@ -1063,9 +1059,10 @@ function ExpenseForm({ item, onSave, onClose }) {
 // ═════════════════════════════════════════════════════════════
 // ADMIN — Manage Users
 // ═════════════════════════════════════════════════════════════
-function AdminPage({ users, onEdit, onAdd, onDel }) {
+function AdminPage({ users, vehicles, onEdit, onAdd, onDel, onAddVehicle, onDelVehicle }) {
   const managers = users.filter(u => u.role === "manager");
   const reps = users.filter(u => u.role === "rep");
+  const [newVehicle, setNewVehicle] = useState("");
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
@@ -1084,16 +1081,14 @@ function AdminPage({ users, onEdit, onAdd, onDel }) {
                 <td><span className="bg bg-bl">{u.email}</span></td>
                 <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>{u.password}</td>
                 <td><span className="bg bg-pp">Manager</span></td>
-                <td>
-                  <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(u)}><I d={IC.edit} s={12} /></button>
-                </td>
+                <td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(u)}><I d={IC.edit} s={12} /></button></td>
               </tr>
             ))}
           </tbody>
         </table></div>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ marginBottom: 16 }}>
         <div className="card-h"><h3>Sales Reps</h3><span className="bg bg-cy">{reps.length}</span></div>
         <div className="tw"><table>
           <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Role</th><th></th></tr></thead>
@@ -1112,6 +1107,24 @@ function AdminPage({ users, onEdit, onAdd, onDel }) {
             ))}
           </tbody>
         </table></div>
+      </div>
+
+      <div className="card">
+        <div className="card-h"><h3>Company Vehicles</h3><span className="bg bg-or">{vehicles.length}</span></div>
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <input value={newVehicle} onChange={e => setNewVehicle(e.target.value)} placeholder="Add vehicle (e.g. 2024 Ford F-150 #1234)" style={{ flex: 1 }} onKeyDown={e => { if (e.key === "Enter" && newVehicle.trim()) { onAddVehicle(newVehicle.trim()); setNewVehicle(""); } }} />
+          <button className="btn btn-p" onClick={() => { if (newVehicle.trim()) { onAddVehicle(newVehicle.trim()); setNewVehicle(""); } }}><I d={IC.plus} s={13} /> Add</button>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {vehicles.map(v => (
+            <div key={v} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", background: "var(--bg3)", borderRadius: 6, border: "1px solid var(--border)", fontSize: 12 }}>
+              <I d={IC.car} s={13} c="var(--orange)" />
+              <span>{v}</span>
+              <span style={{ cursor: "pointer", color: "var(--red)", marginLeft: 4 }} onClick={() => { if (confirm(`Remove vehicle "${v}"?`)) onDelVehicle(v); }}>×</span>
+            </div>
+          ))}
+          {vehicles.length === 0 && <div style={{ fontSize: 11, color: "var(--text3)" }}>No vehicles added yet. Add your company vehicles above.</div>}
+        </div>
       </div>
     </div>
   );
