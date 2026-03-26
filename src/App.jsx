@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 
 // ─── USERS ───────────────────────────────────────────────────
-const USERS = [
+const INITIAL_USERS = [
   { id: "mgr1", name: "Andrew Smith", email: "andrew", password: "7663", role: "manager" },
   { id: "mgr2", name: "Lee Hornsby", email: "lee", password: "7663", role: "manager" },
   { id: "rep1", name: "Byron Cook", email: "byron", password: "Sales1", role: "rep" },
@@ -13,6 +13,7 @@ const TASK_TYPES = ["Quote Order", "Email Information", "Send Samples", "Schedul
 const EXPENSE_CATS = ["Client Meal", "Hotel", "Travel", "Supplies", "Entertainment", "Other"];
 const MAINT_TYPES = ["Oil Change", "Tire Rotation", "Tires", "Brakes", "Repair", "Inspection", "Wash/Detail", "Other"];
 const PRODUCT_LINES = ["Vents", "Wraps/Boots/Pipes", "Scuppers & Drains", "Edge Metal", "Corners & T-Joints", "Sealant Pockets", "Cylindrical Split Pipe", "Coping Metal", "Roof Drains", "EZ PV Mounts", "Accessories", "Custom/Other"];
+const VEHICLES = ["Vehicle 1 - Company Truck", "Vehicle 2 - Company Van", "Vehicle 3 - Company Car", "Personal Vehicle", "Other"];
 
 const seedContacts = [
   // ── SAN DIEGO COUNTY — Roofing Contractors ──
@@ -148,6 +149,7 @@ const IC = {
   chevL: "M15 18l-6-6 6-6",
   chevR: "M9 18l6-6-6-6",
   bldg: "M3 21h18M9 21V6l-6 3v12M9 6l6-3v18M9 8h.01M9 11h.01M9 14h.01M15 8h.01M15 11h.01M15 14h.01",
+  settings: "M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2zM12 15a3 3 0 100-6 3 3 0 000 6z",
 };
 
 // ─── CSS ─────────────────────────────────────────────────────
@@ -340,6 +342,7 @@ const Modal = ({ title, onClose, children, footer }) => (
 // ═════════════════════════════════════════════════════════════
 export default function App() {
   const [user, setUser] = useState(null);
+  const [users, setUsers] = useState(INITIAL_USERS);
   const [contacts, setContacts] = useState(seedContacts);
   const [calls, setCalls] = useState(seedCalls);
   const [tasks, setTasks] = useState(seedTasks);
@@ -366,11 +369,11 @@ export default function App() {
     return user.role === "manager" ? overdueTasks : overdueTasks.filter(t => t.repId === user.id);
   }, [user, overdueTasks]);
 
-  if (!user) return <LoginScreen onLogin={setUser} />;
+  if (!user) return <LoginScreen onLogin={setUser} users={users} />;
 
   const getContact = (id) => contacts.find(c => c.id === id);
   const getContactName = (id) => { const c = getContact(id); return c ? c.company : "—"; };
-  const getRep = (id) => USERS.find(u => u.id === id)?.name || "—";
+  const getRep = (id) => users.find(u => u.id === id)?.name || "—";
   const isRep = user.role === "rep";
   const isMgr = user.role === "manager";
 
@@ -384,11 +387,21 @@ export default function App() {
     else setter(p => [...p, { ...data, id: uid(), repId: user.id, ...(type === "contact" ? { created: today() } : {}) }]);
     close();
   };
+  const saveTask = (data) => {
+    if (data.id) setTasks(p => p.map(t => t.id === data.id ? data : t));
+    else setTasks(p => [...p, { ...data, id: uid(), repId: user.id, status: "pending" }]);
+  };
   const del = (type, id) => {
     const setters = { contact: setContacts, call: setCalls, task: setTasks, event: setEvents, fuel: setFuel, maint: setMaint, expense: setExpenses };
     setters[type](p => p.filter(i => i.id !== id));
   };
   const toggleTask = (id) => setTasks(p => p.map(t => t.id === id ? { ...t, status: t.status === "done" ? "pending" : "done" } : t));
+  const saveUser = (data) => {
+    if (data.id) setUsers(p => p.map(u => u.id === data.id ? data : u));
+    else setUsers(p => [...p, { ...data, id: uid() }]);
+    close();
+  };
+  const delUser = (id) => setUsers(p => p.filter(u => u.id !== id));
 
   const navItems = [
     { s: "MAIN" },
@@ -402,6 +415,7 @@ export default function App() {
     { id: "expenses", icon: IC.dollar, label: "Expenses" },
     { s: "ADMIN" },
     ...(isMgr ? [{ id: "team", icon: IC.users, label: "Team Overview" }] : []),
+    ...(isMgr ? [{ id: "admin", icon: IC.settings, label: "Manage Users" }] : []),
     { id: "reports", icon: IC.report, label: "Reports" },
   ];
 
@@ -409,12 +423,13 @@ export default function App() {
     switch (page) {
       case "dashboard": return <Dashboard user={user} contacts={my(contacts)} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} overdue={myOverdue} setPage={setPage} getContactName={getContactName} getRep={getRep} />;
       case "contacts": return <Contacts contacts={my(contacts)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("contact")} onEdit={c => open("contact", c)} onDel={id => del("contact", id)} />;
-      case "calls": return <Calls calls={my(calls)} contacts={my(contacts)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("call")} onEdit={c => open("call", c)} />;
-      case "tasks": return <Tasks tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("task")} onEdit={t => open("task", t)} onToggle={toggleTask} />;
+      case "calls": return <Calls calls={my(calls)} contacts={my(contacts)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("call")} onEdit={c => open("call", c)} onDel={id => del("call", id)} />;
+      case "tasks": return <Tasks tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("task")} onEdit={t => open("task", t)} onToggle={toggleTask} onDel={id => del("task", id)} />;
       case "calendar": return <Calendar events={my(events)} tasks={my(tasks)} isRep={isRep} getContactName={getContactName} onAdd={() => open("event")} onEdit={e => open("event", e)} />;
       case "vehicle": return <Vehicle fuel={my(fuel)} maint={my(maint)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAddF={() => open("fuel")} onAddM={() => open("maint")} onEditF={f => open("fuel", f)} onEditM={m => open("maint", m)} />;
       case "expenses": return <Expenses expenses={my(expenses)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("expense")} onEdit={e => open("expense", e)} />;
-      case "team": return isMgr ? <Team users={USERS} tasks={tasks} contacts={contacts} calls={calls} expenses={expenses} fuel={fuel} maint={maint} mgrView={mgrView} setMgrView={setMgrView} setPage={setPage} /> : null;
+      case "team": return isMgr ? <Team users={users} tasks={tasks} contacts={contacts} calls={calls} expenses={expenses} fuel={fuel} maint={maint} mgrView={mgrView} setMgrView={setMgrView} setPage={setPage} /> : null;
+      case "admin": return isMgr ? <AdminPage users={users} onEdit={u => open("user", u)} onAdd={() => open("user")} onDel={delUser} /> : null;
       case "reports": return <Reports user={user} contacts={my(contacts)} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} getContactName={getContactName} getRep={getRep} range={reportRange} setRange={setReportRange} />;
       default: return null;
     }
@@ -431,7 +446,7 @@ export default function App() {
             <div><div className="nm">{user.name}</div><div className="rl">{isMgr ? "Manager" : "Sales Rep"}</div></div>
           </div>
           <div className="sb-nav">
-            {isMgr && <div style={{ padding: "4px 12px 8px" }}><select value={mgrView} onChange={e => setMgrView(e.target.value)} style={{ width: "100%", fontSize: 10, padding: "5px 6px" }}><option value="all">All Reps</option>{USERS.filter(u => u.role === "rep").map(u => <option key={u.id} value={u.id}>{u.name}</option>)}</select></div>}
+            {isMgr && <div style={{ padding: "4px 12px 8px" }}><select value={mgrView} onChange={e => setMgrView(e.target.value)} style={{ width: "100%", fontSize: 10, padding: "5px 6px" }}><option value="all">All Reps</option>{users.filter(u => u.role === "rep").map(u => <option key={u.id} value={u.id}>{u.name}</option>)}</select></div>}
             {navItems.map((n, i) => n.s ? <div key={i} className="sec">{n.s}</div> : (
               <div key={n.id} className={`ni ${page === n.id ? "act" : ""}`} onClick={() => setPage(n.id)}>
                 <I d={n.icon} s={15} /><span>{n.label}</span>{n.badge && <span className="bdg">{n.badge}</span>}
@@ -464,12 +479,13 @@ export default function App() {
       </div>
 
       {modal === "contact" && <ContactForm item={editItem} onSave={d => save("contact", d)} onClose={close} />}
-      {modal === "call" && <CallForm item={editItem} contacts={my(contacts)} onSave={d => save("call", d)} onClose={close} />}
+      {modal === "call" && <CallForm item={editItem} contacts={my(contacts)} onSave={d => save("call", d)} onSaveTask={saveTask} onClose={close} />}
       {modal === "task" && <TaskForm item={editItem} contacts={my(contacts)} onSave={d => save("task", d)} onClose={close} />}
       {modal === "event" && <EventForm item={editItem} contacts={my(contacts)} onSave={d => save("event", d)} onClose={close} />}
       {modal === "fuel" && <FuelForm item={editItem} onSave={d => save("fuel", d)} onClose={close} />}
       {modal === "maint" && <MaintForm item={editItem} onSave={d => save("maint", d)} onClose={close} />}
       {modal === "expense" && <ExpenseForm item={editItem} onSave={d => save("expense", d)} onClose={close} />}
+      {modal === "user" && <UserForm item={editItem} onSave={saveUser} onClose={close} />}
     </>
   );
 }
@@ -477,22 +493,19 @@ export default function App() {
 // ═════════════════════════════════════════════════════════════
 // LOGIN
 // ═════════════════════════════════════════════════════════════
-function LoginScreen({ onLogin }) {
+function LoginScreen({ onLogin, users }) {
   const [e, setE] = useState(""); const [p, setP] = useState(""); const [err, setErr] = useState("");
-  const go = () => { const u = USERS.find(u => u.email === e && u.password === p); if (u) onLogin(u); else setErr("Invalid credentials"); };
+  const go = () => { const u = users.find(u => u.email === e && u.password === p); if (u) onLogin(u); else setErr("Invalid username or password"); };
   return (
     <><style>{CSS}</style>
       <div className="lp"><div className="lb-box">
         <h1>Flash<span style={{fontWeight:800}}>T</span>ech</h1>
         <div className="sub">Sales Assistant</div>
         <p>Sign in to continue</p>
-        <div className="fi"><label>Username</label><input value={e} onChange={v => setE(v.target.value)} placeholder="andrew, lee, byron, or marcia" onKeyDown={v => v.key === "Enter" && go()} /></div>
+        <div className="fi"><label>Username</label><input value={e} onChange={v => setE(v.target.value)} placeholder="Enter username" onKeyDown={v => v.key === "Enter" && go()} /></div>
         <div className="fi" style={{ marginTop: 10 }}><label>Password</label><input type="password" value={p} onChange={v => setP(v.target.value)} placeholder="Enter password" onKeyDown={v => v.key === "Enter" && go()} /></div>
         <button className="btn btn-p" onClick={go}>Sign In</button>
         {err && <div className="le">{err}</div>}
-        <div style={{ marginTop: 20, fontSize: 10, color: "var(--text3)", lineHeight: 1.6 }}>
-          <span style={{ fontWeight: 700 }}>Login Accounts:</span><br />Managers: andrew / 7663 · lee / 7663<br />Reps: byron / Sales1 · marcia / sales2
-        </div>
       </div></div>
     </>
   );
@@ -598,7 +611,7 @@ function Contacts({ contacts, isRep, isMgr, getRep, onAdd, onEdit, onDel }) {
 // ═════════════════════════════════════════════════════════════
 // SALES CALLS
 // ═════════════════════════════════════════════════════════════
-function Calls({ calls, contacts, isRep, isMgr, getContactName, getRep, onAdd, onEdit }) {
+function Calls({ calls, contacts, isRep, isMgr, getContactName, getRep, onAdd, onEdit, onDel }) {
   return (
     <div>
       {isRep && <div style={{ marginBottom: 14 }}><button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Log Sales Call</button></div>}
@@ -618,7 +631,10 @@ function Calls({ calls, contacts, isRep, isMgr, getContactName, getRep, onAdd, o
                 <td style={{ maxWidth: 200, fontSize: 11 }}>{c.what}</td>
                 <td style={{ fontSize: 11, color: "var(--green)" }}>{c.outcome}</td>
                 <td style={{ fontSize: 11, color: "var(--yellow)" }}>{c.followUp}</td>
-                <td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(c)}><I d={IC.edit} s={12} /></button></td>
+                <td style={{ whiteSpace: "nowrap" }}>
+                  <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(c)}><I d={IC.edit} s={12} /></button>
+                  {isMgr && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => { if (confirm("Delete this sales call?")) onDel(c.id); }}><I d={IC.trash} s={12} /></button>}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -631,7 +647,7 @@ function Calls({ calls, contacts, isRep, isMgr, getContactName, getRep, onAdd, o
 // ═════════════════════════════════════════════════════════════
 // TASKS
 // ═════════════════════════════════════════════════════════════
-function Tasks({ tasks, isRep, isMgr, getContactName, getRep, onAdd, onEdit, onToggle }) {
+function Tasks({ tasks, isRep, isMgr, getContactName, getRep, onAdd, onEdit, onToggle, onDel }) {
   const [filter, setFilter] = useState("all");
   const filtered = tasks.filter(t => {
     if (filter === "overdue") return t.status !== "done" && isOverdue(t.due);
@@ -661,7 +677,10 @@ function Tasks({ tasks, isRep, isMgr, getContactName, getRep, onAdd, onEdit, onT
                 <td style={{ whiteSpace: "nowrap" }}>{fmtShort(t.due)}</td>
                 <td><span className={`bg ${t.priority === "high" ? "bg-rd" : t.priority === "medium" ? "bg-yl" : "bg-gy"}`}>{t.priority}</span></td>
                 <td><span className={`bg ${t.status === "done" ? "bg-gr" : isOverdue(t.due) ? "bg-rd" : "bg-bl"}`}>{t.status === "done" ? "Done" : isOverdue(t.due) ? "Overdue" : "Pending"}</span></td>
-                <td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(t)}><I d={IC.edit} s={12} /></button></td>
+                <td style={{ whiteSpace: "nowrap" }}>
+                  <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(t)}><I d={IC.edit} s={12} /></button>
+                  {isMgr && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => { if (confirm("Delete this task?")) onDel(t.id); }}><I d={IC.trash} s={12} /></button>}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -761,16 +780,16 @@ function Vehicle({ fuel, maint, isRep, isMgr, getRep, onAddF, onAddM, onEditF, o
       </div>
       {tab === "fuel" ? (
         <div className="tw"><table>
-          <thead><tr><th>Date</th>{isMgr && <th>Rep</th>}<th>Station</th><th>Gallons</th><th>$/Gal</th><th>Total</th><th>Mileage</th><th></th></tr></thead>
+          <thead><tr><th>Date</th>{isMgr && <th>Rep</th>}<th>Vehicle</th><th>Station</th><th>Gallons</th><th>$/Gal</th><th>Total</th><th>Mileage</th><th></th></tr></thead>
           <tbody>{fuel.sort((a, b) => b.date.localeCompare(a.date)).map(f => (
-            <tr key={f.id}><td>{fmtShort(f.date)}</td>{isMgr && <td>{getRep(f.repId)}</td>}<td>{f.station}</td><td>{f.gallons}</td><td>${Number(f.pricePerGal).toFixed(2)}</td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(f.total)}</td><td>{Number(f.mileage).toLocaleString()}</td><td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEditF(f)}><I d={IC.edit} s={12} /></button></td></tr>
+            <tr key={f.id}><td>{fmtShort(f.date)}</td>{isMgr && <td>{getRep(f.repId)}</td>}<td style={{ fontSize: 11 }}>{f.vehicleId || "—"}</td><td>{f.station}</td><td>{f.gallons}</td><td>${Number(f.pricePerGal).toFixed(2)}</td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(f.total)}</td><td>{Number(f.mileage).toLocaleString()}</td><td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEditF(f)}><I d={IC.edit} s={12} /></button></td></tr>
           ))}</tbody>
         </table></div>
       ) : (
         <div className="tw"><table>
-          <thead><tr><th>Date</th>{isMgr && <th>Rep</th>}<th>Type</th><th>Vendor</th><th>Cost</th><th>Mileage</th><th>Notes</th><th></th></tr></thead>
+          <thead><tr><th>Date</th>{isMgr && <th>Rep</th>}<th>Vehicle</th><th>Type</th><th>Vendor</th><th>Cost</th><th>Mileage</th><th>Notes</th><th></th></tr></thead>
           <tbody>{maint.sort((a, b) => b.date.localeCompare(a.date)).map(m => (
-            <tr key={m.id}><td>{fmtShort(m.date)}</td>{isMgr && <td>{getRep(m.repId)}</td>}<td style={{ fontWeight: 600 }}>{m.type}</td><td>{m.vendor}</td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(m.cost)}</td><td>{Number(m.mileage).toLocaleString()}</td><td style={{ fontSize: 11 }}>{m.notes}</td><td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEditM(m)}><I d={IC.edit} s={12} /></button></td></tr>
+            <tr key={m.id}><td>{fmtShort(m.date)}</td>{isMgr && <td>{getRep(m.repId)}</td>}<td style={{ fontSize: 11 }}>{m.vehicleId || "—"}</td><td style={{ fontWeight: 600 }}>{m.type}</td><td>{m.vendor}</td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(m.cost)}</td><td>{Number(m.mileage).toLocaleString()}</td><td style={{ fontSize: 11 }}>{m.notes}</td><td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEditM(m)}><I d={IC.edit} s={12} /></button></td></tr>
           ))}</tbody>
         </table></div>
       )}
@@ -898,12 +917,20 @@ function ContactForm({ item, onSave, onClose }) {
   );
 }
 
-function CallForm({ item, contacts, onSave, onClose }) {
+function CallForm({ item, contacts, onSave, onSaveTask, onClose }) {
   const [f, setF] = useState(item || { contactId: contacts[0]?.id || "", date: today(), time: "", who: "", what: "", where: "", productsDiscussed: "", outcome: "", followUp: "" });
+  const [addTask, setAddTask] = useState(false);
+  const [task, setTask] = useState({ type: "Follow Up Call", title: "", due: "", priority: "medium", notes: "" });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
-  const selContact = contacts.find(c => c.id === f.contactId);
+  const ut = (k, v) => setTask(p => ({ ...p, [k]: v }));
+  const handleSave = () => {
+    onSave(f);
+    if (addTask && task.title && task.due) {
+      onSaveTask({ ...task, contactId: f.contactId, status: "pending" });
+    }
+  };
   return (
-    <Modal title={item ? "Edit Sales Call" : "Log Sales Call"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave(f)}>Save</button></>}>
+    <Modal title={item ? "Edit Sales Call" : "Log Sales Call"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={handleSave}>Save</button></>}>
       <div className="fg">
         <div className="fi"><label>Company</label><select value={f.contactId} onChange={e => { u("contactId", e.target.value); const c = contacts.find(x => x.id === e.target.value); if (c) u("who", c.name); }}>{contacts.map(c => <option key={c.id} value={c.id}>{c.company}</option>)}</select></div>
         <div className="fi"><label>Spoke With</label><input value={f.who} onChange={e => u("who", e.target.value)} placeholder="Contact name" /></div>
@@ -922,6 +949,23 @@ function CallForm({ item, contacts, onSave, onClose }) {
         <div className="fi full"><label>What Was Discussed</label><textarea value={f.what} onChange={e => u("what", e.target.value)} rows={3} placeholder="Details of the conversation..." /></div>
         <div className="fi full"><label>Outcome</label><input value={f.outcome} onChange={e => u("outcome", e.target.value)} placeholder="Result of the call..." /></div>
         <div className="fi full"><label>Follow Up Needed</label><textarea value={f.followUp} onChange={e => u("followUp", e.target.value)} placeholder="Next steps..." /></div>
+      </div>
+
+      {/* ── QUICK ADD TASK ── */}
+      <div style={{ marginTop: 16, padding: 14, background: "var(--bg3)", borderRadius: 8, border: "1px solid var(--border)" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 12, fontWeight: 600, color: "var(--accent)" }}>
+          <input type="checkbox" checked={addTask} onChange={e => setAddTask(e.target.checked)} style={{ width: 15, height: 15 }} />
+          <I d={IC.task} s={14} c="var(--accent)" /> Create a follow-up task from this call
+        </label>
+        {addTask && (
+          <div className="fg" style={{ marginTop: 12 }}>
+            <div className="fi"><label>Task Type</label><select value={task.type} onChange={e => ut("type", e.target.value)}>{TASK_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
+            <div className="fi"><label>Due Date</label><input type="date" value={task.due} onChange={e => ut("due", e.target.value)} /></div>
+            <div className="fi full"><label>Task Description</label><input value={task.title} onChange={e => ut("title", e.target.value)} placeholder="What needs to be done..." /></div>
+            <div className="fi"><label>Priority</label><select value={task.priority} onChange={e => ut("priority", e.target.value)}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
+            <div className="fi"><label>Notes</label><input value={task.notes} onChange={e => ut("notes", e.target.value)} /></div>
+          </div>
+        )}
       </div>
     </Modal>
   );
@@ -963,28 +1007,30 @@ function EventForm({ item, contacts, onSave, onClose }) {
 }
 
 function FuelForm({ item, onSave, onClose }) {
-  const [f, setF] = useState(item || { date: today(), gallons: "", pricePerGal: "", total: "", mileage: "", station: "" });
+  const [f, setF] = useState(item || { date: today(), gallons: "", pricePerGal: "", total: "", mileage: "", station: "", vehicleId: VEHICLES[0] });
   const u = (k, v) => { const n = { ...f, [k]: v }; if ((k === "gallons" || k === "pricePerGal") && n.gallons && n.pricePerGal) n.total = (parseFloat(n.gallons) * parseFloat(n.pricePerGal)).toFixed(2); setF(n); };
   return (
     <Modal title={item ? "Edit Fuel Entry" : "Add Fuel Entry"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave({ ...f, gallons: +f.gallons, pricePerGal: +f.pricePerGal, total: +f.total, mileage: +f.mileage })}>Save</button></>}>
       <div className="fg">
+        <div className="fi"><label>Vehicle</label><select value={f.vehicleId} onChange={e => u("vehicleId", e.target.value)}>{VEHICLES.map(v => <option key={v}>{v}</option>)}</select></div>
         <div className="fi"><label>Date</label><input type="date" value={f.date} onChange={e => u("date", e.target.value)} /></div>
         <div className="fi"><label>Station</label><input value={f.station} onChange={e => u("station", e.target.value)} /></div>
+        <div className="fi"><label>Current Mileage</label><input type="number" value={f.mileage} onChange={e => u("mileage", e.target.value)} /></div>
         <div className="fi"><label>Gallons</label><input type="number" step="0.01" value={f.gallons} onChange={e => u("gallons", e.target.value)} /></div>
         <div className="fi"><label>Price Per Gallon ($)</label><input type="number" step="0.01" value={f.pricePerGal} onChange={e => u("pricePerGal", e.target.value)} /></div>
         <div className="fi"><label>Total ($)</label><input type="number" step="0.01" value={f.total} readOnly style={{ opacity: .7 }} /></div>
-        <div className="fi"><label>Current Mileage</label><input type="number" value={f.mileage} onChange={e => u("mileage", e.target.value)} /></div>
       </div>
     </Modal>
   );
 }
 
 function MaintForm({ item, onSave, onClose }) {
-  const [f, setF] = useState(item || { date: today(), type: "Oil Change", cost: "", mileage: "", vendor: "", notes: "" });
+  const [f, setF] = useState(item || { date: today(), type: "Oil Change", cost: "", mileage: "", vendor: "", notes: "", vehicleId: VEHICLES[0] });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
   return (
     <Modal title={item ? "Edit Vehicle Expense" : "Add Vehicle Expense"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave({ ...f, cost: +f.cost, mileage: +f.mileage })}>Save</button></>}>
       <div className="fg">
+        <div className="fi"><label>Vehicle</label><select value={f.vehicleId} onChange={e => u("vehicleId", e.target.value)}>{VEHICLES.map(v => <option key={v}>{v}</option>)}</select></div>
         <div className="fi"><label>Date</label><input type="date" value={f.date} onChange={e => u("date", e.target.value)} /></div>
         <div className="fi"><label>Type</label><select value={f.type} onChange={e => u("type", e.target.value)}>{MAINT_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
         <div className="fi"><label>Cost ($)</label><input type="number" step="0.01" value={f.cost} onChange={e => u("cost", e.target.value)} /></div>
@@ -1009,6 +1055,78 @@ function ExpenseForm({ item, onSave, onClose }) {
         <div className="fi full"><label>Who (Contact/Client)</label><input value={f.who} onChange={e => u("who", e.target.value)} placeholder="Client name or Self" /></div>
         <div className="fi full"><label>What (Description)</label><textarea value={f.what} onChange={e => u("what", e.target.value)} /></div>
         <div className="fi full"><label>Where (Location)</label><input value={f.where} onChange={e => u("where", e.target.value)} /></div>
+      </div>
+    </Modal>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════
+// ADMIN — Manage Users
+// ═════════════════════════════════════════════════════════════
+function AdminPage({ users, onEdit, onAdd, onDel }) {
+  const managers = users.filter(u => u.role === "manager");
+  const reps = users.filter(u => u.role === "rep");
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
+        <div />
+        <button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Add User</button>
+      </div>
+
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card-h"><h3>Managers</h3><span className="bg bg-gr">{managers.length}</span></div>
+        <div className="tw"><table>
+          <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Role</th><th></th></tr></thead>
+          <tbody>
+            {managers.map(u => (
+              <tr key={u.id}>
+                <td style={{ fontWeight: 600 }}>{u.name}</td>
+                <td><span className="bg bg-bl">{u.email}</span></td>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>{u.password}</td>
+                <td><span className="bg bg-pp">Manager</span></td>
+                <td>
+                  <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(u)}><I d={IC.edit} s={12} /></button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table></div>
+      </div>
+
+      <div className="card">
+        <div className="card-h"><h3>Sales Reps</h3><span className="bg bg-cy">{reps.length}</span></div>
+        <div className="tw"><table>
+          <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Role</th><th></th></tr></thead>
+          <tbody>
+            {reps.map(u => (
+              <tr key={u.id}>
+                <td style={{ fontWeight: 600 }}>{u.name}</td>
+                <td><span className="bg bg-bl">{u.email}</span></td>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>{u.password}</td>
+                <td><span className="bg bg-cy">Sales Rep</span></td>
+                <td style={{ whiteSpace: "nowrap" }}>
+                  <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(u)}><I d={IC.edit} s={12} /></button>
+                  <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => { if (confirm(`Remove ${u.name}? This won't delete their data.`)) onDel(u.id); }}><I d={IC.trash} s={12} /></button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  );
+}
+
+function UserForm({ item, onSave, onClose }) {
+  const [f, setF] = useState(item || { name: "", email: "", password: "", role: "rep" });
+  const u = (k, v) => setF(p => ({ ...p, [k]: v }));
+  return (
+    <Modal title={item ? "Edit User" : "Add User"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave(f)}>Save</button></>}>
+      <div className="fg">
+        <div className="fi full"><label>Full Name</label><input value={f.name} onChange={e => u("name", e.target.value)} placeholder="First and last name" /></div>
+        <div className="fi"><label>Username (login)</label><input value={f.email} onChange={e => u("email", e.target.value)} placeholder="Lowercase, no spaces" /></div>
+        <div className="fi"><label>Password</label><input value={f.password} onChange={e => u("password", e.target.value)} placeholder="Set password" /></div>
+        <div className="fi"><label>Role</label><select value={f.role} onChange={e => u("role", e.target.value)}><option value="rep">Sales Rep</option><option value="manager">Manager</option></select></div>
       </div>
     </Modal>
   );
