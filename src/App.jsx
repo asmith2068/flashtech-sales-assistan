@@ -1,4 +1,34 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { supabase } from "./supabaseClient";
+
+// ─── SUPABASE DATA MAPPING ──────────────────────────────────
+const mapContact = (r) => ({ id: r.id, repId: r.rep_id, company: r.company, name: r.name || "", title: r.title || "", phone: r.phone || "", email: r.email || "", address: r.address || "", notes: r.notes || "", created: r.created_at?.split("T")[0] || "" });
+const mapCall = (r) => ({ id: r.id, repId: r.rep_id, contactId: r.contact_id, date: r.call_date, time: r.call_time || "", who: r.who || "", what: r.what || "", where: r.call_where || "", productsDiscussed: r.products_discussed || "", outcome: r.outcome || "", followUp: r.follow_up || "" });
+const mapTask = (r) => ({ id: r.id, repId: r.rep_id, contactId: r.contact_id, type: r.task_type, title: r.title, due: r.due_date, priority: r.priority, status: r.status, notes: r.notes || "" });
+const mapEvent = (r) => ({ id: r.id, repId: r.rep_id, contactId: r.contact_id || "", date: r.event_date, time: r.start_time || "", endTime: r.end_time || "", title: r.title, type: r.event_type, notes: r.notes || "" });
+const mapFuel = (r) => ({ id: r.id, repId: r.rep_id, date: r.log_date, gallons: r.gallons, pricePerGal: r.price_per_gal, total: r.total, mileage: r.mileage, station: r.station || "", vehicleId: r.vehicle_id || "" });
+const mapMaint = (r) => ({ id: r.id, repId: r.rep_id, date: r.log_date, type: r.maint_type, cost: r.cost, mileage: r.mileage, vendor: r.vendor || "", notes: r.notes || "", vehicleId: r.vehicle_id || "" });
+const mapExpense = (r) => ({ id: r.id, repId: r.rep_id, date: r.expense_date, amount: r.amount, category: r.category, who: r.who || "", what: r.what || "", where: r.expense_where || "", receipt: r.has_receipt });
+const mapUser = (r) => ({ id: r.id, name: r.name, email: r.email, password: r.password_hash, role: r.role });
+
+const toDbContact = (d) => ({ rep_id: d.repId, company: d.company, name: d.name, title: d.title, phone: d.phone, email: d.email, address: d.address, notes: d.notes });
+const toDbCall = (d) => ({ rep_id: d.repId, contact_id: d.contactId, call_date: d.date, call_time: d.time, who: d.who, what: d.what, call_where: d.where, products_discussed: d.productsDiscussed, outcome: d.outcome, follow_up: d.followUp });
+const toDbTask = (d) => ({ rep_id: d.repId, contact_id: d.contactId, task_type: d.type, title: d.title, due_date: d.due, priority: d.priority, status: d.status || "pending", notes: d.notes });
+const toDbEvent = (d) => ({ rep_id: d.repId, contact_id: d.contactId || null, event_date: d.date, start_time: d.time, end_time: d.endTime, title: d.title, event_type: d.type, notes: d.notes });
+const toDbFuel = (d) => ({ rep_id: d.repId, log_date: d.date, gallons: d.gallons, price_per_gal: d.pricePerGal, total: d.total, mileage: d.mileage, station: d.station, vehicle_id: d.vehicleId });
+const toDbMaint = (d) => ({ rep_id: d.repId, log_date: d.date, maint_type: d.type, cost: d.cost, mileage: d.mileage, vendor: d.vendor, notes: d.notes, vehicle_id: d.vehicleId });
+const toDbExpense = (d) => ({ rep_id: d.repId, expense_date: d.date, amount: d.amount, category: d.category, who: d.who, what: d.what, expense_where: d.where, has_receipt: d.receipt });
+const toDbUser = (d) => ({ name: d.name, email: d.email, password_hash: d.password, role: d.role });
+
+const DB_CONFIG = {
+  contact: { table: "contacts", map: mapContact, toDb: toDbContact },
+  call:    { table: "calls",    map: mapCall,    toDb: toDbCall },
+  task:    { table: "tasks",    map: mapTask,    toDb: toDbTask },
+  event:   { table: "events",   map: mapEvent,   toDb: toDbEvent },
+  fuel:    { table: "fuel_log", map: mapFuel,    toDb: toDbFuel },
+  maint:   { table: "maintenance", map: mapMaint, toDb: toDbMaint },
+  expense: { table: "expenses", map: mapExpense, toDb: toDbExpense },
+};
 
 // ─── USERS ───────────────────────────────────────────────────
 const INITIAL_USERS = [
@@ -301,37 +331,60 @@ const Modal = ({ title, onClose, children, footer }) => (
 // ═════════════════════════════════════════════════════════════
 // MAIN APP
 // ═════════════════════════════════════════════════════════════
-const LS = (key, fallback) => { try { const v = localStorage.getItem("ft_" + key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } };
-const SS = (key, val) => { try { localStorage.setItem("ft_" + key, JSON.stringify(val)); } catch {} };
-
 export default function App() {
   const [user, setUser] = useState(null);
-  const [users, setUsers] = useState(() => LS("users", INITIAL_USERS));
-  const [contacts, setContacts] = useState(() => LS("contacts", seedContacts));
-  const [calls, setCalls] = useState(() => LS("calls", seedCalls));
-  const [tasks, setTasks] = useState(() => LS("tasks", seedTasks));
-  const [events, setEvents] = useState(() => LS("events", seedEvents));
-  const [fuel, setFuel] = useState(() => LS("fuel", seedFuel));
-  const [maint, setMaint] = useState(() => LS("maint", seedMaint));
-  const [expenses, setExpenses] = useState(() => LS("expenses", seedExpenses));
-  const [vehicles, setVehicles] = useState(() => LS("vehicles", ["Vehicle 1", "Vehicle 2", "Vehicle 3", "Personal Vehicle"]));
+  const [users, setUsers] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [calls, setCalls] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [fuel, setFuel] = useState([]);
+  const [maint, setMaint] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [page, setPage] = useState("dashboard");
   const [modal, setModal] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [mgrView, setMgrView] = useState("all");
   const [showNotifs, setShowNotifs] = useState(false);
   const [reportRange, setReportRange] = useState("weekly");
+  const [loading, setLoading] = useState(false);
 
-  // ── PERSIST TO LOCALSTORAGE ──
-  useEffect(() => { SS("users", users); }, [users]);
-  useEffect(() => { SS("contacts", contacts); }, [contacts]);
-  useEffect(() => { SS("calls", calls); }, [calls]);
-  useEffect(() => { SS("tasks", tasks); }, [tasks]);
-  useEffect(() => { SS("events", events); }, [events]);
-  useEffect(() => { SS("fuel", fuel); }, [fuel]);
-  useEffect(() => { SS("maint", maint); }, [maint]);
-  useEffect(() => { SS("expenses", expenses); }, [expenses]);
-  useEffect(() => { SS("vehicles", vehicles); }, [vehicles]);
+  // ── LOAD ALL DATA FROM SUPABASE ──
+  const loadAll = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [cRes, clRes, tRes, eRes, fRes, mRes, exRes, uRes, vRes] = await Promise.all([
+        supabase.from("contacts").select("*"),
+        supabase.from("calls").select("*"),
+        supabase.from("tasks").select("*"),
+        supabase.from("events").select("*"),
+        supabase.from("fuel_log").select("*"),
+        supabase.from("maintenance").select("*"),
+        supabase.from("expenses").select("*"),
+        supabase.from("users").select("*"),
+        supabase.from("vehicles").select("*"),
+      ]);
+      if (cRes.data) setContacts(cRes.data.map(mapContact));
+      if (clRes.data) setCalls(clRes.data.map(mapCall));
+      if (tRes.data) setTasks(tRes.data.map(mapTask));
+      if (eRes.data) setEvents(eRes.data.map(mapEvent));
+      if (fRes.data) setFuel(fRes.data.map(mapFuel));
+      if (mRes.data) setMaint(mRes.data.map(mapMaint));
+      if (exRes.data) setExpenses(exRes.data.map(mapExpense));
+      if (uRes.data) setUsers(uRes.data.map(mapUser));
+      if (vRes.data) setVehicles(vRes.data.map(v => v.name));
+    } catch (err) { console.error("Load error:", err); }
+    setLoading(false);
+  }, []);
+
+  // Refresh data every 30 seconds so changes from other devices appear
+  useEffect(() => {
+    if (!user) return;
+    loadAll();
+    const interval = setInterval(loadAll, 30000);
+    return () => clearInterval(interval);
+  }, [user, loadAll]);
 
   const my = useCallback((arr) => {
     if (!user) return [];
@@ -345,7 +398,11 @@ export default function App() {
     return user.role === "manager" ? overdueTasks : overdueTasks.filter(t => t.repId === user.id);
   }, [user, overdueTasks]);
 
-  if (!user) return <LoginScreen onLogin={setUser} users={users} />;
+  if (!user) return <LoginScreen onLogin={(u) => { setUser(u); }} users={users} loadUsers={async () => {
+    const { data } = await supabase.from("users").select("*");
+    if (data) { setUsers(data.map(mapUser)); return data.map(mapUser); }
+    return [];
+  }} />;
 
   const getContact = (id) => contacts.find(c => c.id === id);
   const getContactName = (id) => { const c = getContact(id); return c ? c.company : "—"; };
@@ -357,40 +414,83 @@ export default function App() {
   const open = (m, item = null) => { setEditItem(item); setModal(m); };
   const close = () => { setModal(null); setEditItem(null); };
 
-  const save = (type, data) => {
+  // ── SUPABASE CRUD ──
+  const save = async (type, data) => {
+    const cfg = DB_CONFIG[type];
     const setters = { contact: setContacts, call: setCalls, task: setTasks, event: setEvents, fuel: setFuel, maint: setMaint, expense: setExpenses };
-    const setter = setters[type];
-    if (data.id) setter(p => p.map(i => i.id === data.id ? data : i));
-    else {
-      const repId = data._assignTo || user.id;
-      const clean = { ...data, id: uid(), repId, ...(type === "contact" ? { created: today() } : {}) };
-      delete clean._assignTo;
-      setter(p => [...p, clean]);
+    const repId = data._assignTo || user.id;
+    const clean = { ...data, repId };
+    delete clean._assignTo;
+    delete clean.id;
+
+    if (data.id) {
+      // UPDATE
+      const dbData = cfg.toDb(clean);
+      await supabase.from(cfg.table).update(dbData).eq("id", data.id);
+      setters[type](p => p.map(i => i.id === data.id ? { ...clean, id: data.id } : i));
+    } else {
+      // INSERT
+      const dbData = cfg.toDb({ ...clean, repId });
+      const { data: inserted } = await supabase.from(cfg.table).insert(dbData).select();
+      if (inserted && inserted[0]) {
+        setters[type](p => [...p, cfg.map(inserted[0])]);
+      }
     }
     close();
   };
-  const saveTask = (data) => {
-    if (data.id) setTasks(p => p.map(t => t.id === data.id ? data : t));
-    else {
-      const repId = data._assignTo || user.id;
-      const clean = { ...data, id: uid(), repId, status: "pending" };
-      delete clean._assignTo;
-      setTasks(p => [...p, clean]);
+
+  const saveTask = async (data) => {
+    const repId = data._assignTo || user.id;
+    const clean = { ...data, repId, status: data.status || "pending" };
+    delete clean._assignTo;
+    delete clean.id;
+    const dbData = toDbTask(clean);
+    const { data: inserted } = await supabase.from("tasks").insert(dbData).select();
+    if (inserted && inserted[0]) {
+      setTasks(p => [...p, mapTask(inserted[0])]);
     }
   };
-  const del = (type, id) => {
+
+  const del = async (type, id) => {
+    const cfg = DB_CONFIG[type];
     const setters = { contact: setContacts, call: setCalls, task: setTasks, event: setEvents, fuel: setFuel, maint: setMaint, expense: setExpenses };
+    await supabase.from(cfg.table).delete().eq("id", id);
     setters[type](p => p.filter(i => i.id !== id));
   };
-  const toggleTask = (id) => setTasks(p => p.map(t => t.id === id ? { ...t, status: t.status === "done" ? "pending" : "done" } : t));
-  const saveUser = (data) => {
-    if (data.id) setUsers(p => p.map(u => u.id === data.id ? data : u));
-    else setUsers(p => [...p, { ...data, id: uid() }]);
+
+  const toggleTask = async (id) => {
+    const t = tasks.find(t => t.id === id);
+    if (!t) return;
+    const newStatus = t.status === "done" ? "pending" : "done";
+    await supabase.from("tasks").update({ status: newStatus }).eq("id", id);
+    setTasks(p => p.map(t => t.id === id ? { ...t, status: newStatus } : t));
+  };
+
+  const saveUser = async (data) => {
+    if (data.id) {
+      await supabase.from("users").update(toDbUser(data)).eq("id", data.id);
+      setUsers(p => p.map(u => u.id === data.id ? data : u));
+    } else {
+      const { data: inserted } = await supabase.from("users").insert(toDbUser(data)).select();
+      if (inserted && inserted[0]) setUsers(p => [...p, mapUser(inserted[0])]);
+    }
     close();
   };
-  const delUser = (id) => setUsers(p => p.filter(u => u.id !== id));
-  const saveVehicle = (v) => { setVehicles(p => [...p, v]); };
-  const delVehicle = (v) => { setVehicles(p => p.filter(x => x !== v)); };
+
+  const delUser = async (id) => {
+    await supabase.from("users").delete().eq("id", id);
+    setUsers(p => p.filter(u => u.id !== id));
+  };
+
+  const saveVehicle = async (name) => {
+    const { data: inserted } = await supabase.from("vehicles").insert({ name }).select();
+    if (inserted) setVehicles(p => [...p, name]);
+  };
+
+  const delVehicle = async (name) => {
+    await supabase.from("vehicles").delete().eq("name", name);
+    setVehicles(p => p.filter(v => v !== name));
+  };
 
   const navItems = [
     { s: "MAIN" },
@@ -410,8 +510,8 @@ export default function App() {
 
   const pg = () => {
     switch (page) {
-      case "dashboard": return <Dashboard user={user} contacts={my(contacts)} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} overdue={myOverdue} setPage={setPage} getContactName={getContactName} getRep={getRep} />;
-      case "contacts": return <Contacts contacts={my(contacts)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("contact")} onEdit={c => open("contact", c)} onDel={id => del("contact", id)} />;
+      case "dashboard": return <Dashboard user={user} contacts={contacts} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} overdue={myOverdue} setPage={setPage} getContactName={getContactName} getRep={getRep} />;
+      case "contacts": return <Contacts contacts={contacts} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("contact")} onEdit={c => open("contact", c)} onDel={id => del("contact", id)} />;
       case "calls": return <Calls calls={my(calls)} contacts={contacts} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("call")} onEdit={c => open("call", c)} onDel={id => del("call", id)} />;
       case "tasks": return <Tasks tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("task")} onEdit={t => open("task", t)} onToggle={toggleTask} onDel={id => del("task", id)} />;
       case "calendar": return <Calendar events={my(events)} tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} onAdd={() => open("event")} onEdit={e => open("event", e)} />;
@@ -419,7 +519,7 @@ export default function App() {
       case "expenses": return <Expenses expenses={my(expenses)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("expense")} onEdit={e => open("expense", e)} onDel={id => del("expense", id)} />;
       case "team": return isMgr ? <Team users={users} tasks={tasks} contacts={contacts} calls={calls} expenses={expenses} fuel={fuel} maint={maint} mgrView={mgrView} setMgrView={setMgrView} setPage={setPage} /> : null;
       case "admin": return isMgr ? <AdminPage users={users} vehicles={vehicles} onEdit={u => open("user", u)} onAdd={() => open("user")} onDel={delUser} onAddVehicle={saveVehicle} onDelVehicle={delVehicle} /> : null;
-      case "reports": return <Reports user={user} contacts={my(contacts)} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} getContactName={getContactName} getRep={getRep} range={reportRange} setRange={setReportRange} />;
+      case "reports": return <Reports user={user} contacts={contacts} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} getContactName={getContactName} getRep={getRep} range={reportRange} setRange={setReportRange} />;
       default: return null;
     }
   };
@@ -448,6 +548,8 @@ export default function App() {
           <div className="tb">
             <h2>{navItems.find(n => n.id === page)?.label || "Dashboard"}</h2>
             <div className="tb-act" style={{ position: "relative" }}>
+              {loading && <span style={{ fontSize: 10, color: "var(--accent)", marginRight: 8 }}>Syncing...</span>}
+              <button className="btn btn-g btn-ic" title="Refresh data" onClick={loadAll} style={{ marginRight: 4 }}>↻</button>
               <button className="btn btn-g btn-ic" style={{ position: "relative" }} onClick={() => setShowNotifs(!showNotifs)}>
                 <I d={IC.bell} s={15} />
                 {myOverdue.length > 0 && <span style={{ position: "absolute", top: 2, right: 2, width: 7, height: 7, background: "var(--red)", borderRadius: "50%" }} />}
@@ -482,9 +584,10 @@ export default function App() {
 // ═════════════════════════════════════════════════════════════
 // LOGIN
 // ═════════════════════════════════════════════════════════════
-function LoginScreen({ onLogin, users }) {
-  const [e, setE] = useState(""); const [p, setP] = useState(""); const [err, setErr] = useState("");
-  const go = () => { const u = users.find(u => u.email === e && u.password === p); if (u) onLogin(u); else setErr("Invalid username or password"); };
+function LoginScreen({ onLogin, users, loadUsers }) {
+  const [e, setE] = useState(""); const [p, setP] = useState(""); const [err, setErr] = useState(""); const [allUsers, setAllUsers] = useState(users); const [loaded, setLoaded] = useState(false);
+  useEffect(() => { if (!loaded) { loadUsers().then(u => { if (u && u.length) setAllUsers(u); setLoaded(true); }); } }, [loaded, loadUsers]);
+  const go = () => { const u = allUsers.find(u => u.email === e && u.password === p); if (u) onLogin(u); else setErr("Invalid username or password"); };
   return (
     <><style>{CSS}</style>
       <div className="lp"><div className="lb-box">
