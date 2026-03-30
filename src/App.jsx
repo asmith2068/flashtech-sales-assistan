@@ -333,8 +333,8 @@ const Modal = ({ title, onClose, children, footer }) => (
 // ═════════════════════════════════════════════════════════════
 export default function App() {
   const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [contacts, setContacts] = useState([]);
+  const [users, setUsers] = useState(INITIAL_USERS);
+  const [contacts, setContacts] = useState(seedContacts);
   const [calls, setCalls] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
@@ -354,7 +354,8 @@ export default function App() {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [cRes, clRes, tRes, eRes, fRes, mRes, exRes, uRes, vRes] = await Promise.all([
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000));
+      const dataPromise = Promise.all([
         supabase.from("contacts").select("*"),
         supabase.from("calls").select("*"),
         supabase.from("tasks").select("*"),
@@ -365,6 +366,7 @@ export default function App() {
         supabase.from("users").select("*"),
         supabase.from("vehicles").select("*"),
       ]);
+      const [cRes, clRes, tRes, eRes, fRes, mRes, exRes, uRes, vRes] = await Promise.race([dataPromise, timeoutPromise]);
       if (cRes.data) setContacts(cRes.data.map(mapContact));
       if (clRes.data) setCalls(clRes.data.map(mapCall));
       if (tRes.data) setTasks(tRes.data.map(mapTask));
@@ -374,7 +376,7 @@ export default function App() {
       if (exRes.data) setExpenses(exRes.data.map(mapExpense));
       if (uRes.data) setUsers(uRes.data.map(mapUser));
       if (vRes.data) setVehicles(vRes.data.map(v => v.name));
-    } catch (err) { console.error("Load error:", err); }
+    } catch (err) { console.warn("Database sync unavailable:", err.message || err); }
     setLoading(false);
   }, []);
 
@@ -399,9 +401,11 @@ export default function App() {
   }, [user, overdueTasks]);
 
   if (!user) return <LoginScreen onLogin={(u) => { setUser(u); }} users={users} loadUsers={async () => {
-    const { data } = await supabase.from("users").select("*");
-    if (data) { setUsers(data.map(mapUser)); return data.map(mapUser); }
-    return [];
+    try {
+      const { data } = await supabase.from("users").select("*");
+      if (data && data.length > 0) { const mapped = data.map(mapUser); setUsers(mapped); return mapped; }
+    } catch (err) { console.warn("Could not load users from database:", err); }
+    return INITIAL_USERS;
   }} />;
 
   const getContact = (id) => contacts.find(c => c.id === id);
@@ -585,8 +589,19 @@ export default function App() {
 // LOGIN
 // ═════════════════════════════════════════════════════════════
 function LoginScreen({ onLogin, users, loadUsers }) {
-  const [e, setE] = useState(""); const [p, setP] = useState(""); const [err, setErr] = useState(""); const [allUsers, setAllUsers] = useState(users); const [loaded, setLoaded] = useState(false);
-  useEffect(() => { if (!loaded) { loadUsers().then(u => { if (u && u.length) setAllUsers(u); setLoaded(true); }); } }, [loaded, loadUsers]);
+  const [e, setE] = useState(""); const [p, setP] = useState(""); const [err, setErr] = useState(""); const [allUsers, setAllUsers] = useState(INITIAL_USERS);
+  useEffect(() => {
+    // Try to load from Supabase with a 5-second timeout — fall back to built-in users
+    const timeout = setTimeout(() => {}, 5000);
+    const racePromise = Promise.race([
+      loadUsers(),
+      new Promise(resolve => setTimeout(() => resolve(null), 5000))
+    ]);
+    racePromise.then(u => {
+      clearTimeout(timeout);
+      if (u && u.length > 0) setAllUsers(u);
+    }).catch(() => {});
+  }, []);
   const go = () => { const u = allUsers.find(u => u.email === e && u.password === p); if (u) onLogin(u); else setErr("Invalid username or password"); };
   return (
     <><style>{CSS}</style>
