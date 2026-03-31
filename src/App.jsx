@@ -448,11 +448,19 @@ export default function App() {
     const clean = { ...data, repId, status: data.status || "pending" };
     delete clean._assignTo;
     delete clean.id;
-    const dbData = toDbTask(clean);
-    const { data: inserted } = await supabase.from("tasks").insert(dbData).select();
-    if (inserted && inserted[0]) {
-      setTasks(p => [...p, mapTask(inserted[0])]);
-    }
+    // Always add to local state immediately
+    const localId = uid();
+    const localTask = { ...clean, id: localId };
+    setTasks(p => [...p, localTask]);
+    // Then try to save to database
+    try {
+      const dbData = toDbTask(clean);
+      const { data: inserted } = await supabase.from("tasks").insert(dbData).select();
+      if (inserted && inserted[0]) {
+        // Replace local temp entry with the real database entry
+        setTasks(p => p.map(t => t.id === localId ? mapTask(inserted[0]) : t));
+      }
+    } catch (err) { console.warn("Task save to DB failed:", err); }
   };
 
   const del = async (type, id) => {
@@ -1034,7 +1042,9 @@ function CallForm({ item, contacts, isMgr, reps, onSave, onSaveTask, onClose }) 
   const handleSave = () => {
     onSave(f);
     if (addTask && task.title && task.due) {
-      onSaveTask({ ...task, contactId: f.contactId, status: "pending", _assignTo: f._assignTo });
+      const taskData = { ...task, contactId: f.contactId, status: "pending" };
+      if (isMgr) taskData._assignTo = f._assignTo;
+      onSaveTask(taskData);
     }
   };
   return (
