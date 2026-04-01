@@ -112,6 +112,18 @@ const today = () => new Date().toISOString().split("T")[0];
 const isOverdue = (due) => due < today();
 const dayName = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-US", { weekday: "short" });
 
+// ─── EMAIL HELPERS ───────────────────────────────────────────
+const openEmail = (to, subject, body) => {
+  const s = encodeURIComponent(subject || "");
+  const b = encodeURIComponent(body || "");
+  window.open(`mailto:${to || ""}?subject=${s}&body=${b}`, "_self");
+};
+const buildFollowUpEmail = (call, contactCompany, contactEmail) => {
+  const subject = `Follow Up — ${contactCompany} — Flash-Tech Mfg`;
+  const body = `Hi,\n\nThank you for taking the time to speak with me on ${fmtDate(call.date)}.\n\nAs discussed:\n${call.what || ""}\n\nOutcome: ${call.outcome || ""}\n\nNext Steps: ${call.followUp || ""}\n\nPlease let me know if you have any questions.\n\nBest regards,\nFlash-Tech Mfg, Inc.\n(619) 334-9491\nsales@flash-techinc.com`;
+  openEmail(contactEmail, subject, body);
+};
+
 // ─── SVG ICONS ───────────────────────────────────────────────
 const I = ({ d, s = 18, c = "currentColor" }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
@@ -140,6 +152,7 @@ const IC = {
   chevL: "M15 18l-6-6 6-6",
   chevR: "M9 18l6-6-6-6",
   bldg: "M3 21h18M9 21V6l-6 3v12M9 6l6-3v18M9 8h.01M9 11h.01M9 14h.01M15 8h.01M15 11h.01M15 14h.01",
+  mail: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6",
   settings: "M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2zM12 15a3 3 0 100-6 3 3 0 000 6z",
 };
 
@@ -524,7 +537,7 @@ export default function App() {
     switch (page) {
       case "dashboard": return <Dashboard user={user} contacts={contacts} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} overdue={myOverdue} setPage={setPage} getContactName={getContactName} getRep={getRep} />;
       case "contacts": return <Contacts contacts={contacts} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("contact")} onEdit={c => open("contact", c)} onDel={id => del("contact", id)} />;
-      case "calls": return <Calls calls={my(calls)} contacts={contacts} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("call")} onEdit={c => open("call", c)} onDel={id => del("call", id)} />;
+      case "calls": return <Calls calls={my(calls)} contacts={contacts} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getContact={getContact} getRep={getRep} onAdd={() => open("call")} onEdit={c => open("call", c)} onDel={id => del("call", id)} />;
       case "tasks": return <Tasks tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} getRep={getRep} onAdd={() => open("task")} onEdit={t => open("task", t)} onToggle={toggleTask} onDel={id => del("task", id)} />;
       case "calendar": return <Calendar events={my(events)} tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} onAdd={() => open("event")} onEdit={e => open("event", e)} />;
       case "vehicle": return <Vehicle fuel={my(fuel)} maint={my(maint)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAddF={() => open("fuel")} onAddM={() => open("maint")} onEditF={f => open("fuel", f)} onEditM={m => open("maint", m)} onDelF={id => del("fuel", id)} onDelM={id => del("maint", id)} />;
@@ -710,7 +723,8 @@ function Contacts({ contacts, isRep, isMgr, getRep, onAdd, onEdit, onDel }) {
                 <td style={{ fontSize: 11, maxWidth: 160 }}>{c.address}</td>
                 {isMgr && <td>{getRep(c.repId)}</td>}
                 <td style={{ fontSize: 11, maxWidth: 180, color: "var(--text2)" }}>{c.notes}</td>
-                <td>
+                <td style={{ whiteSpace: "nowrap" }}>
+                  {c.email && <button className="btn btn-sm btn-ic" style={{ background: "var(--accent-s)", color: "var(--accent)", marginRight: 4 }} title="Send email" onClick={() => openEmail(c.email, `Flash-Tech Mfg — ${c.company}`, `Hi ${c.name || ""},\n\nI'm reaching out from Flash-Tech Mfg regarding our single-ply roofing accessories.\n\nBest regards,\nFlash-Tech Mfg, Inc.\n(619) 334-9491`)}><I d={IC.mail} s={12} /></button>}
                   <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(c)}><I d={IC.edit} s={12} /></button>
                   {(isRep || isMgr) && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => onDel(c.id)}><I d={IC.trash} s={12} /></button>}
                 </td>
@@ -726,7 +740,7 @@ function Contacts({ contacts, isRep, isMgr, getRep, onAdd, onEdit, onDel }) {
 // ═════════════════════════════════════════════════════════════
 // SALES CALLS
 // ═════════════════════════════════════════════════════════════
-function Calls({ calls, contacts, isRep, isMgr, getContactName, getRep, onAdd, onEdit, onDel }) {
+function Calls({ calls, contacts, isRep, isMgr, getContactName, getContact, getRep, onAdd, onEdit, onDel }) {
   return (
     <div>
       {(isRep || isMgr) && <div style={{ marginBottom: 14 }}><button className="btn btn-p" onClick={onAdd}><I d={IC.plus} s={13} /> Log Sales Call</button></div>}
@@ -734,7 +748,9 @@ function Calls({ calls, contacts, isRep, isMgr, getContactName, getRep, onAdd, o
         <table>
           <thead><tr><th>Date</th><th>Time</th>{isMgr && <th>Rep</th>}<th>Company</th><th>Spoke With</th><th>Where</th><th>Products</th><th>Discussion</th><th>Outcome</th><th>Follow Up</th><th></th></tr></thead>
           <tbody>
-            {calls.sort((a, b) => b.date.localeCompare(a.date)).map(c => (
+            {calls.sort((a, b) => b.date.localeCompare(a.date)).map(c => {
+              const contact = getContact(c.contactId);
+              return (
               <tr key={c.id}>
                 <td style={{ whiteSpace: "nowrap" }}>{fmtShort(c.date)}</td>
                 <td>{c.time}</td>
@@ -747,11 +763,13 @@ function Calls({ calls, contacts, isRep, isMgr, getContactName, getRep, onAdd, o
                 <td style={{ fontSize: 11, color: "var(--green)" }}>{c.outcome}</td>
                 <td style={{ fontSize: 11, color: "var(--yellow)" }}>{c.followUp}</td>
                 <td style={{ whiteSpace: "nowrap" }}>
+                  {contact?.email && <button className="btn btn-sm btn-ic" style={{ background: "var(--accent-s)", color: "var(--accent)", marginRight: 4 }} title="Send follow-up email" onClick={() => buildFollowUpEmail(c, contact.company, contact.email)}><I d={IC.mail} s={12} /></button>}
                   <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(c)}><I d={IC.edit} s={12} /></button>
                   {isMgr && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => { if (confirm("Delete this sales call?")) onDel(c.id); }}><I d={IC.trash} s={12} /></button>}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -1201,13 +1219,14 @@ function AdminPage({ users, vehicles, onEdit, onAdd, onDel, onAddVehicle, onDelV
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="card-h"><h3>Managers</h3><span className="bg bg-gr">{managers.length}</span></div>
         <div className="tw"><table>
-          <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Role</th><th></th></tr></thead>
+          <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Work Email</th><th>Role</th><th></th></tr></thead>
           <tbody>
             {managers.map(u => (
               <tr key={u.id}>
                 <td style={{ fontWeight: 600 }}>{u.name}</td>
                 <td><span className="bg bg-bl">{u.email}</span></td>
                 <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>{u.password}</td>
+                <td>{u.workEmail ? <span style={{ fontSize: 11, color: "var(--accent)", cursor: "pointer" }} onClick={() => openEmail(u.workEmail)}><I d={IC.mail} s={11} c="var(--accent)" /> {u.workEmail}</span> : <span style={{ fontSize: 10, color: "var(--text3)" }}>Not set</span>}</td>
                 <td><span className="bg bg-pp">Manager</span></td>
                 <td><button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(u)}><I d={IC.edit} s={12} /></button></td>
               </tr>
@@ -1219,13 +1238,14 @@ function AdminPage({ users, vehicles, onEdit, onAdd, onDel, onAddVehicle, onDelV
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="card-h"><h3>Sales Reps</h3><span className="bg bg-cy">{reps.length}</span></div>
         <div className="tw"><table>
-          <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Role</th><th></th></tr></thead>
+          <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Work Email</th><th>Role</th><th></th></tr></thead>
           <tbody>
             {reps.map(u => (
               <tr key={u.id}>
                 <td style={{ fontWeight: 600 }}>{u.name}</td>
                 <td><span className="bg bg-bl">{u.email}</span></td>
                 <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>{u.password}</td>
+                <td>{u.workEmail ? <span style={{ fontSize: 11, color: "var(--accent)", cursor: "pointer" }} onClick={() => openEmail(u.workEmail)}><I d={IC.mail} s={11} c="var(--accent)" /> {u.workEmail}</span> : <span style={{ fontSize: 10, color: "var(--text3)" }}>Not set</span>}</td>
                 <td><span className="bg bg-cy">Sales Rep</span></td>
                 <td style={{ whiteSpace: "nowrap" }}>
                   <button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(u)}><I d={IC.edit} s={12} /></button>
@@ -1259,7 +1279,7 @@ function AdminPage({ users, vehicles, onEdit, onAdd, onDel, onAddVehicle, onDelV
 }
 
 function UserForm({ item, onSave, onClose }) {
-  const [f, setF] = useState(item || { name: "", email: "", password: "", role: "rep" });
+  const [f, setF] = useState(item || { name: "", email: "", password: "", role: "rep", workEmail: "" });
   const u = (k, v) => setF(p => ({ ...p, [k]: v }));
   return (
     <Modal title={item ? "Edit User" : "Add User"} onClose={onClose} footer={<><button className="btn btn-g" onClick={onClose}>Cancel</button><button className="btn btn-p" onClick={() => onSave(f)}>Save</button></>}>
@@ -1268,6 +1288,7 @@ function UserForm({ item, onSave, onClose }) {
         <div className="fi"><label>Username (login)</label><input value={f.email} onChange={e => u("email", e.target.value)} placeholder="Lowercase, no spaces" /></div>
         <div className="fi"><label>Password</label><input value={f.password} onChange={e => u("password", e.target.value)} placeholder="Set password" /></div>
         <div className="fi"><label>Role</label><select value={f.role} onChange={e => u("role", e.target.value)}><option value="rep">Sales Rep</option><option value="manager">Manager</option></select></div>
+        <div className="fi"><label>Work Email (Outlook)</label><input value={f.workEmail || ""} onChange={e => u("workEmail", e.target.value)} placeholder="name@flash-techinc.com" /></div>
       </div>
     </Modal>
   );
