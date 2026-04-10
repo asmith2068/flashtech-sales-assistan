@@ -9,7 +9,7 @@ const mapEvent = (r) => ({ id: r.id, repId: r.rep_id, contactId: r.contact_id ||
 const mapFuel = (r) => ({ id: r.id, repId: r.rep_id, date: r.log_date, gallons: r.gallons, pricePerGal: r.price_per_gal, total: r.total, mileage: r.mileage, station: r.station || "", vehicleId: r.vehicle_id || "" });
 const mapMaint = (r) => ({ id: r.id, repId: r.rep_id, date: r.log_date, type: r.maint_type, cost: r.cost, mileage: r.mileage, vendor: r.vendor || "", notes: r.notes || "", vehicleId: r.vehicle_id || "" });
 const mapExpense = (r) => ({ id: r.id, repId: r.rep_id, date: r.expense_date, amount: r.amount, category: r.category, who: r.who || "", what: r.what || "", where: r.expense_where || "", receipt: r.has_receipt });
-const mapUser = (r) => ({ id: r.id, name: r.name, email: r.email, password: r.password_hash, role: r.role });
+const mapUser = (r) => ({ id: r.id, name: r.name, email: r.email, password: r.password_hash, role: r.role, workEmail: r.work_email || "" });
 
 const toDbContact = (d) => ({ rep_id: d.repId, company: d.company, name: d.name, title: d.title, phone: d.phone, email: d.email, address: d.address, notes: d.notes });
 const toDbCall = (d) => ({ rep_id: d.repId, contact_id: d.contactId, call_date: d.date, call_time: d.time, who: d.who, what: d.what, call_where: d.where, products_discussed: d.productsDiscussed, outcome: d.outcome, follow_up: d.followUp });
@@ -18,7 +18,7 @@ const toDbEvent = (d) => ({ rep_id: d.repId, contact_id: d.contactId || null, ev
 const toDbFuel = (d) => ({ rep_id: d.repId, log_date: d.date, gallons: d.gallons, price_per_gal: d.pricePerGal, total: d.total, mileage: d.mileage, station: d.station, vehicle_id: d.vehicleId });
 const toDbMaint = (d) => ({ rep_id: d.repId, log_date: d.date, maint_type: d.type, cost: d.cost, mileage: d.mileage, vendor: d.vendor, notes: d.notes, vehicle_id: d.vehicleId });
 const toDbExpense = (d) => ({ rep_id: d.repId, expense_date: d.date, amount: d.amount, category: d.category, who: d.who, what: d.what, expense_where: d.where, has_receipt: d.receipt });
-const toDbUser = (d) => ({ name: d.name, email: d.email, password_hash: d.password, role: d.role });
+const toDbUser = (d) => ({ name: d.name, email: d.email, password_hash: d.password, role: d.role, work_email: d.workEmail || null });
 
 const DB_CONFIG = {
   contact: { table: "contacts", map: mapContact, toDb: toDbContact },
@@ -492,12 +492,28 @@ export default function App() {
   };
 
   const saveUser = async (data) => {
+    // Validate required fields
+    if (!data.name || !data.email || !data.password) {
+      alert("Please fill in name, username, and password");
+      return;
+    }
     if (data.id) {
-      await supabase.from("users").update(toDbUser(data)).eq("id", data.id);
+      // UPDATE
       setUsers(p => p.map(u => u.id === data.id ? data : u));
+      try { await supabase.from("users").update(toDbUser(data)).eq("id", data.id); }
+      catch (err) { console.warn("User update DB save failed:", err); }
     } else {
-      const { data: inserted } = await supabase.from("users").insert(toDbUser(data)).select();
-      if (inserted && inserted[0]) setUsers(p => [...p, mapUser(inserted[0])]);
+      // INSERT — add locally first so UI updates immediately
+      const localId = uid();
+      const localUser = { ...data, id: localId };
+      setUsers(p => [...p, localUser]);
+      try {
+        const { data: inserted, error } = await supabase.from("users").insert(toDbUser(data)).select();
+        if (error) throw error;
+        if (inserted && inserted[0]) {
+          setUsers(p => p.map(u => u.id === localId ? mapUser(inserted[0]) : u));
+        }
+      } catch (err) { console.warn("User insert DB save failed:", err); }
     }
     close();
   };
