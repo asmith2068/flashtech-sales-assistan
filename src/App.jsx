@@ -103,6 +103,83 @@ const seedMaint = [];
 
 const seedExpenses = [];
 
+// ─── PRODUCT CATALOG DATA ────────────────────────────────────
+const PRODUCTS = [
+  { cat: "Closed Boots", desc: '1-6" Conical Boot', tpoPart: "WS-1001TPO", pvcPart: "WS-1001PVC", tR: 24.80, tW: 20.00, pR: 25.80, pW: 21.50 },
+  { cat: "Closed Boots", desc: 'Compact Conical Boot', tpoPart: "WS-1005TPO", pvcPart: "WS-1005PVC", tR: 23.56, tW: null, pR: 24.56, pW: null },
+  { cat: "Closed Boots", desc: '6-8" Conical Boot', tpoPart: "WS-1006TPO", pvcPart: "WS-1006PVC", tR: 32.00, tW: 27.00, pR: 33.00, pW: 28.00 },
+  { cat: "Closed Boots", desc: '8-10" Conical Boot', tpoPart: "WS-1008TPO", pvcPart: "WS-1008PVC", tR: 36.00, tW: 29.00, pR: 37.00, pW: 31.00 },
+  { cat: "Closed Boots", desc: '2" Pipe Flashing', tpoPart: "WS-1011TPO", pvcPart: "WS-1011PVC", tR: 27.90, tW: 19.00, pR: 28.90, pW: 20.00 },
+  { cat: "Closed Boots", desc: '3" Pipe Flashing', tpoPart: "WS-1013TPO", pvcPart: "WS-1013PVC", tR: 30.90, tW: 21.00, pR: 31.90, pW: 22.00 },
+  { cat: "Closed Boots", desc: '4" Vent Pipe Flashing', tpoPart: "WS-1015TPO", pvcPart: "WS-1015PVC", tR: 35.10, tW: 22.90, pR: 36.10, pW: 23.75 },
+  { cat: "Closed Boots", desc: '6" Vent Pipe Flashing', tpoPart: "WS-1017TPO", pvcPart: "WS-1017PVC", tR: 41.50, tW: 27.50, pR: 42.50, pW: 28.50 },
+  { cat: "Closed Boots", desc: '4" Square Wrap', tpoPart: "WS-1020TPO", pvcPart: "WS-1020PVC", tR: 37.50, tW: 25.50, pR: 38.50, pW: 26.50 },
+  { cat: "Closed Boots", desc: '6" Square Wrap', tpoPart: "WS-1022TPO", pvcPart: "WS-1022PVC", tR: 40.00, tW: 26.25, pR: 41.00, pW: 28.25 },
+  { cat: "Split Boots", desc: '1-6" Split Conical Boot', tpoPart: "WS-1002TPO", pvcPart: "WS-1002PVC", tR: 24.80, tW: 22.25, pR: 25.80, pW: 24.00 },
+  { cat: "Split Boots", desc: 'Compact Split Conical Pipe Boot', tpoPart: "WS-1005TPO", pvcPart: "WS-1005PVC", tR: 23.56, tW: 19.00, pR: 23.56, pW: 20.50 },
+  { cat: "Split Boots", desc: '6-8" Split Conical Boot', tpoPart: "WS-1007TPO", pvcPart: "WS-1007PVC", tR: 32.00, tW: 29.00, pR: 33.00, pW: 30.00 },
+  { cat: "Split Boots", desc: '8-10" Split Conical Boot', tpoPart: "WS-1009TPO", pvcPart: "WS-1009PVC", tR: 36.00, tW: 30.00, pR: 37.00, pW: 31.00 },
+  { cat: "Split Boots", desc: '1.5" Split Pipe Flashing', tpoPart: "WS-1010TPO", pvcPart: "WS-1010PVC", tR: 26.00, tW: 19.00, pR: 27.00, pW: 20.00 },
+  { cat: "Split Boots", desc: '2" Split Pipe Flashing', tpoPart: "WS-1012TPO", pvcPart: "WS-1012PVC", tR: 28.90, tW: 19.50, pR: 29.90, pW: 20.50 },
+  { cat: "Split Boots", desc: '3" Split Pipe Flashing', tpoPart: "WS-1014TPO", pvcPart: "WS-1014PVC", tR: 31.90, tW: 21.50, pR: 32.90, pW: 22.25 },
+  { cat: "Split Boots", desc: '4" Split Pipe Flashing', tpoPart: "WS-1016TPO", pvcPart: "WS-1016PVC", tR: 36.10, tW: 23.25, pR: 37.10, pW: 24.00 },
+  { cat: "Split Boots", desc: '6" Split Pipe Flashing', tpoPart: "WS-1018TPO", pvcPart: "WS-1018PVC", tR: 42.50, tW: 28.25, pR: 43.50, pW: null },
+  { cat: "Split Boots", desc: '4" Split Square Wrap', tpoPart: "WS-1021TPO", pvcPart: "WS-1021PVC", tR: 38.50, tW: 27.75, pR: 39.50, pW: 28.75 },
+  { cat: "Split Boots", desc: '6" Split Square Wrap', tpoPart: "WS-1023TPO", pvcPart: "WS-1023PVC", tR: 41.00, tW: 28.50, pR: 41.00, pW: 29.50 },
+  { cat: "Scuppers", desc: '<10" Scupper Drain (4 sides)', tpoPart: "WSD-1001TPO", pvcPart: "WSD-1001PVC", tR: 107.50, tW: 59.75, pR: 110.00, pW: 59.75 },
+  { cat: "Scuppers", desc: '<16" Scupper Drain (4 sides)', tpoPart: "WSD-1002TPO", pvcPart: "WSD-1002PVC", tR: 112.00, tW: 66.00, pR: 115.00, pW: 68.00 },
+  { cat: "Scuppers", desc: '<24" Scupper Drain (4 sides)', tpoPart: "WSD-1003TPO", pvcPart: "WSD-1003PVC", tR: 135.00, tW: 70.25, pR: 136.00, pW: 71.75 },
+  { cat: "Scuppers", desc: '<27" Scupper Drain (4 sides)', tpoPart: "WSD-1004TPO", pvcPart: "WSD-1004PVC", tR: 157.30, tW: 71.75, pR: 158.50, pW: 73.00 },
+  { cat: "Scuppers", desc: '<34" Scupper Drain (4 sides)', tpoPart: "WSD-1005TPO", pvcPart: "WSD-1005PVC", tR: 181.50, tW: 73.50, pR: 183.00, pW: 75.50 },
+  { cat: "Drains", desc: '2" Deck Drain Stainless Steel', tpoPart: "WS-2001SS", pvcPart: "WS-2001SS", tR: 55.00, tW: 42.00, pR: 56.00, pW: 42.00 },
+  { cat: "Drains", desc: '3" Deck Drain Stainless Steel', tpoPart: "WS-2002SS", pvcPart: "WS-2002SS", tR: 57.00, tW: 45.00, pR: 58.00, pW: 45.00 },
+  { cat: "Drains", desc: '2" Drain Insert (SS) Retro Fit', tpoPart: "WSD-1010TPO", pvcPart: "WSD-1010PVC", tR: 154.00, tW: 141.75, pR: 155.00, pW: 143.00 },
+  { cat: "Drains", desc: '3" Drain Insert (SS) Retro Fit', tpoPart: "WSD-1012TPO", pvcPart: "WSD-1012PVC", tR: 168.00, tW: 162.75, pR: 168.00, pW: 156.00 },
+  { cat: "Drains", desc: '2" Bowl Drain', tpoPart: "WSD-1020TPO", pvcPart: "WSD-1020PVC", tR: 162.00, tW: 135.25, pR: 163.00, pW: 138.50 },
+  { cat: "Drains", desc: '2" Bowl Drain Side Outlet', tpoPart: "WSD-1021TPO", pvcPart: "WSD-1021PVC", tR: 214.50, tW: 165.75, pR: 215.50, pW: 168.00 },
+  { cat: "Drains", desc: '2" Bowl Drain w/ Overflow', tpoPart: "WSD-1022TPO", pvcPart: "WSD-1022PVC", tR: 210.00, tW: 168.00, pR: 212.00, pW: 170.00 },
+  { cat: "Drains", desc: '3" Bowl Drain', tpoPart: "WSD-1023TPO", pvcPart: "WSD-1023PVC", tR: 185.00, tW: 147.00, pR: 187.00, pW: 149.00 },
+  { cat: "Drains", desc: '3" Bowl Drain Side Outlet', tpoPart: "WSD-1024TPO", pvcPart: "WSD-1024PVC", tR: 225.00, tW: 181.00, pR: 227.00, pW: 186.75 },
+  { cat: "Drains", desc: '3" Bowl Drain w/ Overflow', tpoPart: "WSD-1025TPO", pvcPart: "WSD-1025PVC", tR: 230.00, tW: 189.00, pR: 235.00, pW: 191.00 },
+  { cat: "Drains", desc: '4" Bowl Drain', tpoPart: "WSD-1026TPO", pvcPart: "WSD-1026PVC", tR: 245.00, tW: 205.00, pR: 247.00, pW: 215.00 },
+  { cat: "Drains", desc: '4" Bowl Drain Side Outlet', tpoPart: "WSD-1027TPO", pvcPart: "WSD-1027PVC", tR: 289.00, tW: 250.00, pR: 290.00, pW: 260.00 },
+  { cat: "Drains", desc: '4" Bowl Drain w/ Overflow', tpoPart: "WSD-1028TPO", pvcPart: "WSD-1028PVC", tR: 300.00, tW: 260.00, pR: 305.00, pW: 275.00 },
+  { cat: "Gravity Vents", desc: '12" Gravity Vent', tpoPart: "WSG-1001TPO", pvcPart: "WSG-1001PVC", tR: 212.50, tW: 166.00, pR: 214.00, pW: 170.00 },
+  { cat: "Gravity Vents", desc: '14" Gravity Vent', tpoPart: "WSG-1002TPO", pvcPart: "WSG-1002PVC", tR: 218.00, tW: 176.00, pR: 220.00, pW: 180.00 },
+  { cat: "Gravity Vents", desc: '16" Gravity Vent', tpoPart: "WSG-1003TPO", pvcPart: "WSG-1003PVC", tR: 234.50, tW: 188.86, pR: 236.00, pW: 187.00 },
+  { cat: "Gravity Vents", desc: '18" Gravity Vent', tpoPart: "WSG-1004TPO", pvcPart: "WSG-1004PVC", tR: 265.00, tW: 191.00, pR: 267.00, pW: 191.50 },
+  { cat: "Gravity Vents", desc: '20" Gravity Vent', tpoPart: "WSG-1005TPO", pvcPart: "WSG-1005PVC", tR: 270.00, tW: 214.00, pR: 272.00, pW: 217.25 },
+  { cat: "Gravity Vents", desc: '24" Gravity Vent', tpoPart: "WSG-1006TPO", pvcPart: "WSG-1006PVC", tR: 284.00, tW: 217.75, pR: 285.00, pW: 223.25 },
+  { cat: "T-Top Vents", desc: '4" T-Top Vent', tpoPart: "WST-1001TPO", pvcPart: "WST-1001PVC", tR: 48.00, tW: 43.00, pR: 49.00, pW: 44.00 },
+  { cat: "T-Top Vents", desc: '6" T-Top Vent', tpoPart: "WST-1002TPO", pvcPart: "WST-1002PVC", tR: 55.00, tW: 49.25, pR: 56.00, pW: 50.25 },
+  { cat: "T-Top Vents", desc: '8" T-Top Vent', tpoPart: "WST-1003TPO", pvcPart: "WST-1003PVC", tR: 68.00, tW: 59.75, pR: 68.00, pW: 60.75 },
+  { cat: "T-Top Vents", desc: '4" x 12" Rectangular T-Top Vent', tpoPart: "WST-1004TPO", pvcPart: "WST-1004PVC", tR: 130.00, tW: 105.00, pR: 132.00, pW: 110.25 },
+  { cat: "Gable Vents", desc: '14" x 12" Gable Vent', tpoPart: "WSV-1001TPO", pvcPart: "WSV-1001PVC", tR: 125.00, tW: 102.75, pR: 127.00, pW: 102.75 },
+  { cat: "Gable Vents", desc: '14" x 18" Gable Vent', tpoPart: "WSV-1002TPO", pvcPart: "WSV-1002PVC", tR: 135.00, tW: 110.25, pR: 135.00, pW: 110.25 },
+  { cat: "Breather Vents", desc: '4" Breather Vent (One Way)', tpoPart: "WSV-1004TPO", pvcPart: "WSV-1004PVC", tR: 43.00, tW: 31.00, pR: 43.00, pW: 33.25 },
+  { cat: "Breather Vents", desc: '4" Breather Vent (Two Way)', tpoPart: "WSV-1013TPO", pvcPart: "WSV-1013PVC", tR: 40.00, tW: 28.00, pR: 41.00, pW: 29.00 },
+  { cat: "Turbine Vents", desc: '12" Turbine Roof Vent', tpoPart: "WSV-1005TPO", pvcPart: "WSV-1005PVC", tR: 125.00, tW: 114.25, pR: 126.00, pW: 116.50 },
+  { cat: "Turbine Vents", desc: '14" Turbine Roof Vent', tpoPart: "WSV-1009TPO", pvcPart: "WSV-1009PVC", tR: 140.00, tW: 125.75, pR: 142.00, pW: 127.00 },
+  { cat: "Wall Vents", desc: '4" Wall Mount Flapper / Dryer Vent', tpoPart: "WSV-1006TPO", pvcPart: "WSV-1006PVC", tR: 115.00, tW: 79.75, pR: 117.00, pW: 81.75 },
+  { cat: "Sealant Pockets", desc: '4" Sealant Pocket', tpoPart: "WSP1005TPO", pvcPart: "WSP-1005PVC", tR: 37.00, tW: 29.75, pR: 38.00, pW: 32.00 },
+  { cat: "Sealant Pockets", desc: '6" Sealant Pocket', tpoPart: "WSP-1006TPO", pvcPart: "WSP-1006PVC", tR: 42.00, tW: 37.25, pR: 43.00, pW: 39.25 },
+  { cat: "Sealant Pockets", desc: '8" Sealant Pocket', tpoPart: "WSP-1007TPO", pvcPart: "WSP-1007PVC", tR: 51.00, tW: 45.50, pR: 52.00, pW: 46.00 },
+  { cat: "Oval Flashings", desc: '4" Oval Flashing Sub Base', tpoPart: "WSV-1007TPO", pvcPart: "WSV-1007PVC", tR: 68.00, tW: 53.50, pR: 69.00, pW: 54.60 },
+  { cat: "Oval Flashings", desc: '7" Oval Flashing Sub Base', tpoPart: "WSV-1008TPO", pvcPart: "WSV-1008PVC", tR: 75.00, tW: 63.00, pR: 76.00, pW: 66.00 },
+  { cat: "Accessories", desc: 'Solar Anchor Boot', tpoPart: "WSA-1018", pvcPart: "WSA-1019", tR: 19.00, tW: 19.00, pR: 19.00, pW: 19.00 },
+  { cat: "Accessories", desc: '3.5" Injection Molded Outside Corner', tpoPart: "WSA-1001TPO", pvcPart: "WSA-1001PVC", tR: 4.50, tW: 3.65, pR: 4.50, pW: 4.20 },
+  { cat: "Accessories", desc: '6" Non-Reinforced Outside Corner', tpoPart: "WSA-1002TPO", pvcPart: "WSA-1002PVC", tR: 10.00, tW: 7.60, pR: 10.00, pW: 8.40 },
+  { cat: "Accessories", desc: '6" Non-Reinforced Inside Corner', tpoPart: "WSA-1003TPO", pvcPart: "WSA-1003PVC", tR: 10.00, tW: 7.60, pR: 10.00, pW: 8.40 },
+  { cat: "Accessories", desc: '4.5" T-Joint Cover (100 pc)', tpoPart: "WSA-1004TPO", pvcPart: "WSA-1004PVC", tR: 120.00, tW: 72.00, pR: 125.00, pW: 73.00 },
+  { cat: "Accessories", desc: 'Rubber Coupler 2"', tpoPart: "WSA-1010", pvcPart: "WSA-1010", tR: 10.00, tW: 6.50, pR: 10.00, pW: 6.50 },
+  { cat: "Accessories", desc: 'Rubber Coupler 3"', tpoPart: "WSA-1011", pvcPart: "WSA-1011", tR: 12.00, tW: 7.00, pR: 12.00, pW: 7.00 },
+  { cat: "Accessories", desc: 'Clamp (1-6")', tpoPart: "WSA-1008", pvcPart: "WSA-1008", tR: 2.50, tW: 2.25, pR: 2.50, pW: 2.25 },
+  { cat: "Accessories", desc: 'Hose Clamps 1.5" - 2.5"', tpoPart: "WSA-1014", pvcPart: "WSA-1014", tR: 2.25, tW: 2.00, pR: 2.25, pW: 2.00 },
+  { cat: "Accessories", desc: 'Clamp (1/2" - 1.5")', tpoPart: "WSA-1013", pvcPart: "WSA-1013", tR: 2.00, tW: 1.95, pR: 2.00, pW: 1.95 },
+  { cat: "Accessories", desc: 'Flat Roof Attachment', tpoPart: "WSA-1017", pvcPart: "WSA-1017", tR: 31.00, tW: 28.00, pR: 31.00, pW: 28.00 },
+];
+const PROD_CATS = [...new Set(PRODUCTS.map(p => p.cat))];
+
 // ─── UTILITY ─────────────────────────────────────────────────
 const uid = () => Math.random().toString(36).slice(2, 10);
 const fmt = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
@@ -153,6 +230,7 @@ const IC = {
   chevR: "M9 18l6-6-6-6",
   bldg: "M3 21h18M9 21V6l-6 3v12M9 6l6-3v18M9 8h.01M9 11h.01M9 14h.01M15 8h.01M15 11h.01M15 14h.01",
   mail: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6",
+  tag: "M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01",
   settings: "M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2zM12 15a3 3 0 100-6 3 3 0 000 6z",
 };
 
@@ -543,6 +621,8 @@ export default function App() {
     { s: "TRACKING" },
     { id: "vehicle", icon: IC.car, label: "Vehicle & Gas" },
     { id: "expenses", icon: IC.dollar, label: "Expenses" },
+    { s: "CATALOG" },
+    { id: "products", icon: IC.tag, label: "Product Catalog" },
     { s: "ADMIN" },
     ...(isMgr ? [{ id: "team", icon: IC.users, label: "Team Overview" }] : []),
     ...(isMgr ? [{ id: "admin", icon: IC.settings, label: "Manage Users" }] : []),
@@ -558,6 +638,7 @@ export default function App() {
       case "calendar": return <Calendar events={my(events)} tasks={my(tasks)} isRep={isRep} isMgr={isMgr} getContactName={getContactName} onAdd={() => open("event")} onEdit={e => open("event", e)} />;
       case "vehicle": return <Vehicle fuel={my(fuel)} maint={my(maint)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAddF={() => open("fuel")} onAddM={() => open("maint")} onEditF={f => open("fuel", f)} onEditM={m => open("maint", m)} onDelF={id => del("fuel", id)} onDelM={id => del("maint", id)} />;
       case "expenses": return <Expenses expenses={my(expenses)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("expense")} onEdit={e => open("expense", e)} onDel={id => del("expense", id)} />;
+      case "products": return <ProductCatalog />;
       case "team": return isMgr ? <Team users={users} tasks={tasks} contacts={contacts} calls={calls} expenses={expenses} fuel={fuel} maint={maint} mgrView={mgrView} setMgrView={setMgrView} setPage={setPage} /> : null;
       case "admin": return isMgr ? <AdminPage users={users} vehicles={vehicles} onEdit={u => open("user", u)} onAdd={() => open("user")} onDel={delUser} onAddVehicle={saveVehicle} onDelVehicle={delVehicle} /> : null;
       case "reports": return <Reports user={user} contacts={contacts} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} getContactName={getContactName} getRep={getRep} range={reportRange} setRange={setReportRange} />;
@@ -965,6 +1046,71 @@ function Expenses({ expenses, isRep, isMgr, getRep, onAdd, onEdit, onDel }) {
           <tr key={e.id}><td>{fmtShort(e.date)}</td>{isMgr && <td>{getRep(e.repId)}</td>}<td><span className="bg bg-pp">{e.category}</span></td><td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{fmt(e.amount)}</td><td>{e.who}</td><td>{e.what}</td><td>{e.where}</td><td>{e.receipt ? <span className="bg bg-gr">Yes</span> : <span className="bg bg-rd">No</span>}</td><td style={{ whiteSpace: "nowrap" }}><button className="btn btn-g btn-sm btn-ic" onClick={() => onEdit(e)}><I d={IC.edit} s={12} /></button>{isMgr && <button className="btn btn-d btn-sm btn-ic" style={{ marginLeft: 4 }} onClick={() => { if (confirm("Delete this expense?")) onDel(e.id); }}><I d={IC.trash} s={12} /></button>}</td></tr>
         ))}</tbody>
       </table></div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════
+// PRODUCT CATALOG
+// ═════════════════════════════════════════════════════════════
+function ProductCatalog() {
+  const [search, setSearch] = useState("");
+  const [catFilter, setCatFilter] = useState("All");
+  const [matFilter, setMatFilter] = useState("Both");
+  const filtered = PRODUCTS.filter(p => {
+    const q = search.toLowerCase();
+    const matchesSearch = !q || p.desc.toLowerCase().includes(q) || p.tpoPart.toLowerCase().includes(q) || p.pvcPart.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q);
+    const matchesCat = catFilter === "All" || p.cat === catFilter;
+    return matchesSearch && matchesCat;
+  });
+  const $$ = (v) => v != null ? `$${v.toFixed(2)}` : "—";
+  return (
+    <div>
+      <div className="stats">
+        <div className="st"><div className="lb">Total Products</div><div className="vl" style={{ color: "var(--accent)" }}>{PRODUCTS.length}</div><div className="su">{PROD_CATS.length} categories</div></div>
+        <div className="st"><div className="lb">Showing</div><div className="vl">{filtered.length}</div><div className="su">matching filters</div></div>
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap", alignItems: "center" }}>
+        <input placeholder="Search part #, description..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: 260 }} />
+        <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ fontSize: 12, padding: "7px 8px" }}>
+          <option value="All">All Categories</option>
+          {PROD_CATS.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <div className="tabs" style={{ marginLeft: "auto" }}>
+          <div className={`tab ${matFilter === "Both" ? "act" : ""}`} onClick={() => setMatFilter("Both")}>Both</div>
+          <div className={`tab ${matFilter === "TPO" ? "act" : ""}`} onClick={() => setMatFilter("TPO")}>TPO Only</div>
+          <div className={`tab ${matFilter === "PVC" ? "act" : ""}`} onClick={() => setMatFilter("PVC")}>PVC Only</div>
+        </div>
+      </div>
+      <div className="tw"><table>
+        <thead><tr>
+          <th style={{ minWidth: 140 }}>Category</th>
+          <th style={{ minWidth: 220 }}>Description</th>
+          {(matFilter === "Both" || matFilter === "TPO") && <><th>TPO Part #</th><th style={{ color: "var(--green)" }}>TPO Wholesale</th><th style={{ color: "var(--accent)" }}>TPO Retail</th></>}
+          {(matFilter === "Both" || matFilter === "PVC") && <><th>PVC Part #</th><th style={{ color: "var(--green)" }}>PVC Wholesale</th><th style={{ color: "var(--accent)" }}>PVC Retail</th></>}
+        </tr></thead>
+        <tbody>
+          {filtered.map((p, i) => (
+            <tr key={i}>
+              <td><span className="bg bg-cy">{p.cat}</span></td>
+              <td style={{ fontWeight: 600 }}>{p.desc}</td>
+              {(matFilter === "Both" || matFilter === "TPO") && <>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>{p.tpoPart}</td>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, color: "var(--green)" }}>{$$(p.tW)}</td>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, color: "var(--accent)" }}>{$$(p.tR)}</td>
+              </>}
+              {(matFilter === "Both" || matFilter === "PVC") && <>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>{p.pvcPart}</td>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, color: "var(--green)" }}>{$$(p.pW)}</td>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, color: "var(--accent)" }}>{$$(p.pR)}</td>
+              </>}
+            </tr>
+          ))}
+        </tbody>
+      </table></div>
+      <div style={{ marginTop: 12, fontSize: 10, color: "var(--text3)" }}>
+        Flash-Tech Mfg, Inc. | 215 Denny Way Ste D, El Cajon, CA 92020 | (619) 334-9491 | sales@flash-techinc.com
+      </div>
     </div>
   );
 }
