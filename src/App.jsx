@@ -623,6 +623,7 @@ export default function App() {
     { id: "expenses", icon: IC.dollar, label: "Expenses" },
     { s: "CATALOG" },
     { id: "products", icon: IC.tag, label: "Product Catalog" },
+    { id: "quotes", icon: IC.report, label: "Create Quote" },
     { s: "ADMIN" },
     ...(isMgr ? [{ id: "team", icon: IC.users, label: "Team Overview" }] : []),
     ...(isMgr ? [{ id: "admin", icon: IC.settings, label: "Manage Users" }] : []),
@@ -639,6 +640,7 @@ export default function App() {
       case "vehicle": return <Vehicle fuel={my(fuel)} maint={my(maint)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAddF={() => open("fuel")} onAddM={() => open("maint")} onEditF={f => open("fuel", f)} onEditM={m => open("maint", m)} onDelF={id => del("fuel", id)} onDelM={id => del("maint", id)} />;
       case "expenses": return <Expenses expenses={my(expenses)} isRep={isRep} isMgr={isMgr} getRep={getRep} onAdd={() => open("expense")} onEdit={e => open("expense", e)} onDel={id => del("expense", id)} />;
       case "products": return <ProductCatalog />;
+      case "quotes": return <QuoteBuilder contacts={contacts} user={user} />;
       case "team": return isMgr ? <Team users={users} tasks={tasks} contacts={contacts} calls={calls} expenses={expenses} fuel={fuel} maint={maint} mgrView={mgrView} setMgrView={setMgrView} setPage={setPage} /> : null;
       case "admin": return isMgr ? <AdminPage users={users} vehicles={vehicles} onEdit={u => open("user", u)} onAdd={() => open("user")} onDel={delUser} onAddVehicle={saveVehicle} onDelVehicle={delVehicle} /> : null;
       case "reports": return <Reports user={user} contacts={contacts} calls={my(calls)} tasks={my(tasks)} events={my(events)} fuel={my(fuel)} maint={my(maint)} expenses={my(expenses)} getContactName={getContactName} getRep={getRep} range={reportRange} setRange={setReportRange} />;
@@ -1110,6 +1112,213 @@ function ProductCatalog() {
       </table></div>
       <div style={{ marginTop: 12, fontSize: 10, color: "var(--text3)" }}>
         Flash-Tech Mfg, Inc. | 215 Denny Way Ste D, El Cajon, CA 92020 | (619) 334-9491 | sales@flash-techinc.com
+      </div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════
+// QUOTE BUILDER
+// ═════════════════════════════════════════════════════════════
+function QuoteBuilder({ contacts, user }) {
+  const [customer, setCustomer] = useState({ company: "", contact: "", email: "", phone: "", jobName: "", location: "" });
+  const [material, setMaterial] = useState("TPO");
+  const [priceLevel, setPriceLevel] = useState("retail");
+  const [lines, setLines] = useState([]);
+  const [selProd, setSelProd] = useState("");
+  const [qty, setQty] = useState(1);
+  const [notes, setNotes] = useState("");
+  const [contactId, setContactId] = useState("");
+
+  const fillFromContact = (id) => {
+    setContactId(id);
+    const c = contacts.find(x => x.id === id);
+    if (c) setCustomer({ company: c.company, contact: c.name, email: c.email, phone: c.phone, jobName: "", location: c.address });
+  };
+  const addLine = () => {
+    const prod = PRODUCTS.find((p, i) => String(i) === selProd);
+    if (!prod || qty < 1) return;
+    const partNum = material === "TPO" ? prod.tpoPart : prod.pvcPart;
+    const unitPrice = priceLevel === "wholesale" ? (material === "TPO" ? prod.tW : prod.pW) : (material === "TPO" ? prod.tR : prod.pR);
+    if (unitPrice == null) { alert("No " + priceLevel + " price available for this item in " + material); return; }
+    setLines(p => [...p, { desc: prod.desc, partNum, qty: +qty, unitPrice, total: +(qty * unitPrice).toFixed(2), cat: prod.cat }]);
+    setQty(1);
+  };
+  const removeLine = (i) => setLines(p => p.filter((_, idx) => idx !== i));
+  const subtotal = lines.reduce((s, l) => s + l.total, 0);
+
+  const generateQuote = () => {
+    const quoteNum = "FT-" + Date.now().toString(36).toUpperCase();
+    const dateStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const w = window.open("", "_blank");
+    w.document.write(`<!DOCTYPE html><html><head><title>Flash-Tech Quote ${quoteNum}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:#1a1a1a;padding:40px;max-width:850px;margin:0 auto}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:4px solid #39B54A;padding-bottom:20px;margin-bottom:24px}
+.hdr-left h1{font-size:28px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px}
+.hdr-left h1 span{color:#39B54A}
+.hdr-left p{font-size:11px;color:#666;margin-top:4px}
+.hdr-right{text-align:right}
+.hdr-right .qt{font-size:22px;font-weight:700;color:#39B54A}
+.hdr-right .dt{font-size:11px;color:#666;margin-top:4px}
+.info{display:flex;gap:40px;margin-bottom:24px}
+.info-box{flex:1;background:#f8f8f8;border:1px solid #e5e5e5;border-radius:6px;padding:14px 16px}
+.info-box h3{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#39B54A;margin-bottom:8px;font-weight:700}
+.info-box p{font-size:12px;line-height:1.6;color:#333}
+.info-box p strong{font-weight:600}
+table{width:100%;border-collapse:collapse;margin-bottom:20px}
+thead th{background:#1a1a1a;color:#fff;padding:10px 12px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;text-align:left}
+thead th:last-child,thead th:nth-child(3),thead th:nth-child(4){text-align:right}
+tbody td{padding:9px 12px;border-bottom:1px solid #e5e5e5;font-size:12px}
+tbody td:last-child,tbody td:nth-child(3),tbody td:nth-child(4){text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600}
+tbody tr:nth-child(even){background:#fafafa}
+.part{font-family:'JetBrains Mono',monospace;font-size:10px;color:#888}
+.cat{display:inline-block;background:#e8f5e9;color:#1B7A28;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:600}
+.totals{display:flex;justify-content:flex-end;margin-bottom:30px}
+.totals-box{width:260px}
+.totals-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}
+.totals-row.grand{border-top:2px solid #1a1a1a;border-bottom:none;padding-top:12px;font-size:16px;font-weight:700;color:#39B54A}
+.notes{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:6px;padding:14px 16px;margin-bottom:24px}
+.notes h3{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#39B54A;margin-bottom:6px;font-weight:700}
+.notes p{font-size:11px;color:#555;line-height:1.6}
+.footer{text-align:center;padding-top:20px;border-top:2px solid #39B54A}
+.footer p{font-size:10px;color:#888;line-height:1.8}
+.footer .tag{font-size:11px;font-weight:600;color:#39B54A;margin-bottom:4px}
+.material-tag{display:inline-block;background:${material === "TPO" ? "#e3f2fd" : "#f3e5f5"};color:${material === "TPO" ? "#1565c0" : "#7b1fa2"};padding:3px 10px;border-radius:3px;font-size:11px;font-weight:600}
+.price-tag{display:inline-block;background:${priceLevel === "wholesale" ? "#e8f5e9" : "#fff3e0"};color:${priceLevel === "wholesale" ? "#2e7d32" : "#e65100"};padding:3px 10px;border-radius:3px;font-size:11px;font-weight:600;margin-left:6px}
+@media print{body{padding:20px}button{display:none!important}}
+</style></head><body>
+<div class="hdr">
+  <div class="hdr-left">
+    <h1>FLASH<span>-TECH</span> MFG</h1>
+    <p>Single-Ply Roofing Accessories | Prefabricated Flashings</p>
+    <p>215 Denny Way Suite D, El Cajon, CA 92020</p>
+    <p>(619) 334-9491 | sales@flash-techinc.com</p>
+  </div>
+  <div class="hdr-right">
+    <div class="qt">QUOTE</div>
+    <div class="dt">${quoteNum}</div>
+    <div class="dt">${dateStr}</div>
+    <div style="margin-top:8px"><span class="material-tag">${material}</span><span class="price-tag">${priceLevel === "wholesale" ? "Wholesale" : "Retail"}</span></div>
+  </div>
+</div>
+<div class="info">
+  <div class="info-box">
+    <h3>Prepared For</h3>
+    <p><strong>${customer.company || "—"}</strong></p>
+    <p>${customer.contact ? "Attn: " + customer.contact : ""}</p>
+    <p>${customer.phone || ""}</p>
+    <p>${customer.email || ""}</p>
+    <p>${customer.location || ""}</p>
+  </div>
+  <div class="info-box">
+    <h3>Project Details</h3>
+    <p><strong>Job:</strong> ${customer.jobName || "—"}</p>
+    <p><strong>Material:</strong> ${material}</p>
+    <p><strong>Prepared By:</strong> ${user.name}</p>
+    <p><strong>Valid For:</strong> 30 Days</p>
+  </div>
+</div>
+<table>
+  <thead><tr><th>Item</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+  <tbody>
+    ${lines.map((l, i) => `<tr><td><span class="cat">${l.cat}</span><br/><span class="part">${l.partNum}</span></td><td>${l.desc}</td><td style="text-align:right">${l.qty}</td><td>$${l.unitPrice.toFixed(2)}</td><td>$${l.total.toFixed(2)}</td></tr>`).join("")}
+  </tbody>
+</table>
+<div class="totals">
+  <div class="totals-box">
+    <div class="totals-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+    <div class="totals-row"><span>Tax</span><span>TBD</span></div>
+    <div class="totals-row"><span>Shipping</span><span>TBD</span></div>
+    <div class="totals-row grand"><span>Total</span><span>$${subtotal.toFixed(2)}</span></div>
+  </div>
+</div>
+${notes ? `<div class="notes"><h3>Notes</h3><p>${notes.replace(/\n/g, "<br/>")}</p></div>` : ""}
+<div class="footer">
+  <p class="tag">FLASH-TECH MFG, INC.</p>
+  <p>CNC-Cut Precision | Automated Heat Welding | Quality-Controlled In-House Manufacturing</p>
+  <p>www.flash-techinc.com | sales@flash-techinc.com | (619) 334-9491</p>
+  <p style="margin-top:8px;font-size:9px">This quote is valid for 30 days from the date issued. Prices subject to change. Custom accessories are non-returnable upon order placement.</p>
+</div>
+<div style="text-align:center;margin-top:20px">
+  <button onclick="window.print()" style="background:#39B54A;color:#fff;border:none;padding:12px 32px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;margin-right:10px">Print / Save as PDF</button>
+  <button onclick="window.close()" style="background:#666;color:#fff;border:none;padding:12px 32px;border-radius:6px;font-size:14px;cursor:pointer">Close</button>
+</div>
+</body></html>`);
+    w.document.close();
+  };
+
+  const emailQuote = () => {
+    const linesSummary = lines.map(l => `${l.qty}x ${l.desc} (${l.partNum}) - $${l.total.toFixed(2)}`).join("\n");
+    const body = `Dear ${customer.contact || customer.company},\n\nThank you for your interest in Flash-Tech products. Please find your quote details below:\n\nMaterial: ${material}\nJob: ${customer.jobName || "N/A"}\n\n${linesSummary}\n\nSubtotal: $${subtotal.toFixed(2)}\n(Tax & shipping TBD)\n\nThis quote is valid for 30 days.\n\nPlease let me know if you have any questions.\n\nBest regards,\n${user.name}\nFlash-Tech Mfg, Inc.\n(619) 334-9491\nsales@flash-techinc.com`;
+    openEmail(customer.email, `Flash-Tech Quote — ${customer.company || "Quote"}`, body);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>
+        <div className="card" style={{ flex: 1, minWidth: 300 }}>
+          <div className="card-h"><h3>Customer Info</h3></div>
+          <div className="fg">
+            <div className="fi full"><label>Select from Contacts</label><select value={contactId} onChange={e => fillFromContact(e.target.value)}><option value="">— Select contact —</option>{contacts.map(c => <option key={c.id} value={c.id}>{c.company}</option>)}</select></div>
+            <div className="fi"><label>Company</label><input value={customer.company} onChange={e => setCustomer(p => ({ ...p, company: e.target.value }))} /></div>
+            <div className="fi"><label>Contact Person</label><input value={customer.contact} onChange={e => setCustomer(p => ({ ...p, contact: e.target.value }))} /></div>
+            <div className="fi"><label>Email</label><input value={customer.email} onChange={e => setCustomer(p => ({ ...p, email: e.target.value }))} /></div>
+            <div className="fi"><label>Phone</label><input value={customer.phone} onChange={e => setCustomer(p => ({ ...p, phone: e.target.value }))} /></div>
+            <div className="fi"><label>Job Name</label><input value={customer.jobName} onChange={e => setCustomer(p => ({ ...p, jobName: e.target.value }))} placeholder="Project name" /></div>
+            <div className="fi"><label>Location</label><input value={customer.location} onChange={e => setCustomer(p => ({ ...p, location: e.target.value }))} /></div>
+          </div>
+        </div>
+        <div className="card" style={{ flex: 1, minWidth: 300 }}>
+          <div className="card-h"><h3>Add Products</h3></div>
+          <div className="fg">
+            <div className="fi"><label>Material</label><select value={material} onChange={e => setMaterial(e.target.value)}><option>TPO</option><option>PVC</option></select></div>
+            <div className="fi"><label>Price Level</label><select value={priceLevel} onChange={e => setPriceLevel(e.target.value)}><option value="retail">Retail</option><option value="wholesale">Wholesale</option></select></div>
+            <div className="fi full"><label>Product</label><select value={selProd} onChange={e => setSelProd(e.target.value)}><option value="">— Select product —</option>{PRODUCTS.map((p, i) => <option key={i} value={String(i)}>[{p.cat}] {p.desc}</option>)}</select></div>
+            <div className="fi"><label>Quantity</label><input type="number" min="1" value={qty} onChange={e => setQty(e.target.value)} /></div>
+            <div className="fi"><label>&nbsp;</label><button className="btn btn-p" onClick={addLine}><I d={IC.plus} s={13} /> Add to Quote</button></div>
+          </div>
+        </div>
+      </div>
+
+      {lines.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <div className="card-h"><h3>Quote Line Items</h3><span className="bg bg-gr">{lines.length} items</span></div>
+          <div className="tw"><table>
+            <thead><tr><th>Part #</th><th>Description</th><th>Category</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead>
+            <tbody>
+              {lines.map((l, i) => (
+                <tr key={i}>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>{l.partNum}</td>
+                  <td style={{ fontWeight: 600 }}>{l.desc}</td>
+                  <td><span className="bg bg-cy">{l.cat}</span></td>
+                  <td>{l.qty}</td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>${l.unitPrice.toFixed(2)}</td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, color: "var(--accent)" }}>${l.total.toFixed(2)}</td>
+                  <td><button className="btn btn-d btn-sm btn-ic" onClick={() => removeLine(i)}><I d={IC.trash} s={12} /></button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table></div>
+          <div style={{ display: "flex", justifyContent: "flex-end", padding: "12px 0", fontSize: 18, fontWeight: 700, color: "var(--accent)" }}>
+            Subtotal: ${subtotal.toFixed(2)}
+          </div>
+        </div>
+      )}
+
+      <div className="fg" style={{ marginBottom: 16 }}>
+        <div className="fi full"><label>Notes (optional)</label><textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Lead times, special instructions, color, shipping notes..." /></div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <button className="btn btn-p" onClick={generateQuote} disabled={lines.length === 0}>
+          <I d={IC.report} s={13} /> Preview / Print / Save PDF
+        </button>
+        {customer.email && <button className="btn btn-g" onClick={emailQuote} disabled={lines.length === 0}>
+          <I d={IC.mail} s={13} /> Email Quote Summary
+        </button>}
       </div>
     </div>
   );
